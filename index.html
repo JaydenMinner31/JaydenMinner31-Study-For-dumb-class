@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>StudyFlow By Jayden Minner — Cold War Ch. 14</title>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,300;0,500;1,300&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --bg: #0f0f11; --surface: #18181c; --surface2: #222228;
+    --border: rgba(255,255,255,0.07); --text: #f0eee8; --muted: #6b6975;
+    --accent: #c8f060; --accent2: #f0a060; --red: #f06070; --radius: 20px;
+  }
+  body { background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-serif; min-height: 100vh; overflow-x: hidden; }
+  body::before, body::after { content: ''; position: fixed; border-radius: 50%; filter: blur(120px); pointer-events: none; z-index: 0; }
+  body::before { width: 600px; height: 600px; background: rgba(200,240,96,0.04); top: -200px; right: -100px; }
+  body::after { width: 500px; height: 500px; background: rgba(240,160,96,0.04); bottom: -200px; left: -100px; }
+  .app { position: relative; z-index: 1; max-width: 900px; margin: 0 auto; padding: 40px 24px; min-height: 100vh; display: flex; flex-direction: column; }
+  .header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 36px; animation: fadeUp 0.6s ease both; flex-wrap: wrap; gap: 16px; }
+  .header-left { display: flex; flex-direction: column; gap: 4px; }
+  .logo { font-family: 'Fraunces', serif; font-size: 1.4rem; font-weight: 300; letter-spacing: -0.02em; }
+  .logo span { color: var(--accent); font-style: italic; }
+  .chapter-tag { font-size: 0.72rem; color: var(--muted); letter-spacing: 0.08em; text-transform: uppercase; }
+  .mode-toggle { display: flex; background: var(--surface); border: 1px solid var(--border); border-radius: 50px; padding: 4px; gap: 2px; }
+  .mode-btn { padding: 8px 20px; border-radius: 50px; border: none; background: transparent; color: var(--muted); font-family: 'DM Sans', sans-serif; font-size: 0.85rem; font-weight: 500; cursor: pointer; transition: all 0.25s ease; }
+  .mode-btn.active { background: var(--accent); color: #111; }
+  .content { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 24px; }
+  .flashcard-wrap { width: 100%; perspective: 1200px; animation: fadeUp 0.5s 0.1s ease both; }
+  .flashcard-spacer { min-height: 300px; display: flex; align-items: center; justify-content: center; width: 100%; }
+  .flashcard { width: 100%; max-width: 680px; margin: 0 auto; min-height: 300px; position: relative; cursor: pointer; transform-style: preserve-3d; transition: transform 0.65s cubic-bezier(0.4, 0, 0.2, 1); }
+  .flashcard.flipped { transform: rotateY(180deg); }
+  .card-face { position: absolute; inset: 0; backface-visibility: hidden; -webkit-backface-visibility: hidden; border-radius: var(--radius); border: 1px solid var(--border); display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 44px 40px 60px; text-align: center; }
+  .card-front { background: var(--surface); }
+  .card-front::before { content: ''; position: absolute; inset: 0; border-radius: var(--radius); background: linear-gradient(135deg, rgba(200,240,96,0.05) 0%, transparent 60%); pointer-events: none; }
+  .card-back { background: var(--surface2); transform: rotateY(180deg); }
+  .card-back::before { content: ''; position: absolute; inset: 0; border-radius: var(--radius); background: linear-gradient(135deg, rgba(240,160,96,0.06) 0%, transparent 60%); pointer-events: none; }
+  .card-label { font-size: 0.7rem; font-weight: 500; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); margin-bottom: 20px; position: relative; z-index: 1; }
+  .card-text { font-family: 'Fraunces', serif; font-size: clamp(1rem, 2.5vw, 1.45rem); font-weight: 300; line-height: 1.5; color: var(--text); position: relative; z-index: 1; }
+  .card-hint { position: absolute; bottom: 20px; font-size: 0.72rem; color: var(--muted); text-align: center; padding: 0 20px; }
+  .card-category { position: absolute; top: 18px; right: 20px; font-size: 0.65rem; letter-spacing: 0.1em; text-transform: uppercase; padding: 4px 10px; border-radius: 20px; border: 1px solid var(--border); color: var(--muted); background: var(--surface2); z-index: 2; }
+  .progress-bar { width: 100%; max-width: 680px; height: 3px; background: var(--surface2); border-radius: 10px; overflow: hidden; }
+  .progress-fill { height: 100%; background: var(--accent); border-radius: 10px; transition: width 0.4s cubic-bezier(0.4,0,0.2,1); }
+  .counter { font-size: 0.85rem; color: var(--muted); text-align: center; }
+  .counter strong { color: var(--text); }
+  .card-nav { display: flex; gap: 12px; align-items: center; }
+  .nav-btn { width: 52px; height: 52px; border-radius: 50%; border: 1px solid var(--border); background: var(--surface); color: var(--text); cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s ease; font-size: 1.1rem; }
+  .nav-btn:hover:not(:disabled) { border-color: var(--accent); color: var(--accent); transform: scale(1.05); }
+  .nav-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+  .pill-btn { padding: 0 20px; height: 52px; border-radius: 50px; border: 1px solid var(--border); background: var(--surface); color: var(--muted); font-family: 'DM Sans', sans-serif; font-size: 0.8rem; cursor: pointer; transition: all 0.2s ease; }
+  .pill-btn:hover { border-color: var(--accent2); color: var(--accent2); }
+  .filter-row { display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; animation: fadeUp 0.5s 0.15s ease both; max-width: 680px; width: 100%; }
+  .filter-chip { padding: 6px 14px; border-radius: 50px; border: 1px solid var(--border); background: var(--surface); color: var(--muted); font-size: 0.75rem; cursor: pointer; transition: all 0.2s ease; }
+  .filter-chip.active { border-color: var(--accent); color: var(--accent); background: rgba(200,240,96,0.06); }
+  .quiz-wrap { width: 100%; max-width: 680px; margin: 0 auto; animation: fadeUp 0.5s 0.1s ease both; }
+  .question-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 36px 36px 28px; margin-bottom: 16px; position: relative; overflow: hidden; }
+  .question-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px; background: linear-gradient(90deg, var(--accent), var(--accent2)); }
+  .question-num { font-size: 0.7rem; font-weight: 500; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); margin-bottom: 14px; }
+  .question-text { font-family: 'Fraunces', serif; font-size: clamp(1rem, 2.5vw, 1.3rem); font-weight: 300; line-height: 1.55; }
+  .options { display: flex; flex-direction: column; gap: 9px; }
+  .option-btn { width: 100%; padding: 16px 20px; border-radius: 13px; border: 1px solid var(--border); background: var(--surface); color: var(--text); font-family: 'DM Sans', sans-serif; font-size: 0.88rem; text-align: left; cursor: pointer; transition: all 0.2s ease; display: flex; align-items: center; gap: 14px; }
+  .option-letter { width: 28px; height: 28px; border-radius: 8px; background: var(--surface2); border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; font-size: 0.72rem; font-weight: 500; flex-shrink: 0; transition: all 0.2s ease; color: var(--muted); }
+  .option-btn:hover:not(:disabled) { border-color: rgba(200,240,96,0.3); background: rgba(200,240,96,0.04); transform: translateX(4px); }
+  .option-btn:hover:not(:disabled) .option-letter { background: var(--accent); color: #111; border-color: var(--accent); }
+  .option-btn.correct { border-color: var(--accent); background: rgba(200,240,96,0.08); animation: pulse-correct 0.4s ease; }
+  .option-btn.correct .option-letter { background: var(--accent); color: #111; border-color: var(--accent); }
+  .option-btn.wrong { border-color: var(--red); background: rgba(240,96,112,0.08); animation: shake 0.35s ease; }
+  .option-btn.wrong .option-letter { background: var(--red); color: #fff; border-color: var(--red); }
+  .option-btn:disabled { cursor: default; }
+  .option-btn:disabled:not(.correct):not(.wrong) { opacity: 0.45; }
+  .feedback { padding: 13px 18px; border-radius: 12px; font-size: 0.88rem; font-weight: 500; opacity: 0; transform: translateY(8px); transition: all 0.3s ease; pointer-events: none; margin-top: 10px; }
+  .feedback.show { opacity: 1; transform: translateY(0); pointer-events: auto; }
+  .feedback.correct-fb { background: rgba(200,240,96,0.1); border: 1px solid rgba(200,240,96,0.2); color: var(--accent); }
+  .feedback.wrong-fb { background: rgba(240,96,112,0.1); border: 1px solid rgba(240,96,112,0.2); color: var(--red); }
+  .quiz-nav { display: flex; justify-content: space-between; align-items: center; margin-top: 20px; }
+  .next-btn { padding: 13px 28px; border-radius: 50px; border: none; background: var(--accent); color: #111; font-family: 'DM Sans', sans-serif; font-size: 0.88rem; font-weight: 500; cursor: pointer; transition: all 0.2s ease; opacity: 0; transform: translateY(8px); pointer-events: none; }
+  .next-btn.show { opacity: 1; transform: translateY(0); pointer-events: auto; }
+  .next-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(200,240,96,0.2); }
+  .stats-row { display: flex; gap: 10px; animation: fadeUp 0.5s 0.2s ease both; flex-wrap: wrap; }
+  .stat-chip { padding: 7px 14px; border-radius: 50px; border: 1px solid var(--border); background: var(--surface); font-size: 0.78rem; color: var(--muted); display: flex; align-items: center; gap: 6px; }
+  .stat-chip .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent); }
+  .stat-chip .dot.red { background: var(--red); }
+  .score-screen { text-align: center; animation: fadeUp 0.6s ease both; }
+  .score-circle { width: 140px; height: 140px; border-radius: 50%; border: 3px solid var(--accent); display: flex; flex-direction: column; align-items: center; justify-content: center; margin: 0 auto 28px; background: radial-gradient(circle, rgba(200,240,96,0.08), transparent); animation: popIn 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) both; }
+  .score-num { font-family: 'Fraunces', serif; font-size: 2.5rem; font-weight: 300; color: var(--accent); line-height: 1; }
+  .score-total { font-size: 0.8rem; color: var(--muted); margin-top: 4px; }
+  .score-msg { font-family: 'Fraunces', serif; font-size: 1.5rem; font-weight: 300; margin-bottom: 10px; }
+  .score-sub { color: var(--muted); font-size: 0.88rem; margin-bottom: 28px; line-height: 1.6; }
+  .score-actions { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+  .restart-btn { padding: 13px 28px; border-radius: 50px; border: 1px solid var(--border); background: var(--surface); color: var(--text); font-family: 'DM Sans', sans-serif; font-size: 0.88rem; cursor: pointer; transition: all 0.2s ease; }
+  .restart-btn:hover { border-color: var(--accent); color: var(--accent); }
+  .restart-btn.primary { background: var(--accent); color: #111; border-color: var(--accent); }
+  .restart-btn.primary:hover { box-shadow: 0 8px 24px rgba(200,240,96,0.2); color: #111; }
+  @keyframes fadeUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+  @keyframes popIn { from { opacity: 0; transform: scale(0.6); } to { opacity: 1; transform: scale(1); } }
+  @keyframes pulse-correct { 0% { transform: scale(1); } 50% { transform: scale(1.01); } 100% { transform: scale(1); } }
+  @keyframes shake { 0%, 100% { transform: translateX(0); } 20% { transform: translateX(-6px); } 60% { transform: translateX(6px); } }
+  @keyframes cardSlideIn { from { opacity: 0; transform: translateX(30px); } to { opacity: 1; transform: translateX(0); } }
+  .slide-in { animation: cardSlideIn 0.3s ease both; }
+  .hidden { display: none !important; }
+</style>
+</head>
+<body>
+<div class="app">
+  <header class="header">
+    <div class="header-left">
+      <div class="logo">Study<span>Flow</span></div>
+      <div class="chapter-tag">US History · Chapter 14 · Cold War Review</div>
+    </div>
+    <div class="mode-toggle">
+      <button class="mode-btn active" onclick="setMode('flashcard')">Flashcards</button>
+      <button class="mode-btn" onclick="setMode('quiz')">Quiz</button>
+    </div>
+  </header>
+
+  <!-- FLASHCARD MODE -->
+  <div id="flashcard-mode" class="content">
+    <div class="filter-row" id="filter-row">
+      <div class="filter-chip active" onclick="setFilter('all',this)">All Cards</div>
+      <div class="filter-chip" onclick="setFilter('concept',this)">Concepts</div>
+      <div class="filter-chip" onclick="setFilter('vocab',this)">Vocabulary</div>
+      <div class="filter-chip" onclick="setFilter('people',this)">People</div>
+      <div class="filter-chip" onclick="setFilter('event',this)">Events</div>
+    </div>
+    <div class="flashcard-wrap">
+      <div class="flashcard-spacer">
+        <div class="flashcard" id="flashcard" onclick="flipCard()">
+          <div class="card-face card-front">
+            <div class="card-category" id="fc-category">Concept</div>
+            <div class="card-label">Question</div>
+            <div class="card-text" id="fc-question">Click to begin</div>
+            <div class="card-hint">Click to reveal · ← → to navigate · Space to flip</div>
+          </div>
+          <div class="card-face card-back">
+            <div class="card-label">Answer</div>
+            <div class="card-text" id="fc-answer">Answer</div>
+            <div class="card-hint">Click to flip back</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="progress-bar"><div class="progress-fill" id="fc-progress" style="width:0%"></div></div>
+    <div class="counter">Card <strong id="fc-current">1</strong> of <strong id="fc-total">0</strong></div>
+    <div class="card-nav">
+      <button class="nav-btn" id="fc-prev" onclick="prevCard()">←</button>
+      <button class="pill-btn" onclick="shuffleCards()">⇌ Shuffle</button>
+      <button class="nav-btn" id="fc-next" onclick="nextCard()">→</button>
+    </div>
+  </div>
+
+  <!-- QUIZ MODE -->
+  <div id="quiz-mode" class="content hidden">
+    <div id="quiz-content" style="width:100%;max-width:680px;">
+      <div id="score-screen" class="score-screen hidden">
+        <div class="score-circle">
+          <div class="score-num" id="score-num">0</div>
+          <div class="score-total" id="score-total">of 0</div>
+        </div>
+        <div class="score-msg" id="score-msg">Good effort!</div>
+        <div class="score-sub" id="score-sub">Keep practicing!</div>
+        <div class="score-actions">
+          <button class="restart-btn primary" onclick="restartQuiz()">Try Again</button>
+          <button class="restart-btn" onclick="setMode('flashcard')">Review Flashcards</button>
+        </div>
+      </div>
+      <div id="question-ui">
+        <div class="stats-row">
+          <div class="stat-chip"><span class="dot"></span><span id="q-correct-count">0 correct</span></div>
+          <div class="stat-chip"><span class="dot red"></span><span id="q-wrong-count">0 wrong</span></div>
+        </div>
+        <div class="progress-bar" style="margin-bottom:16px;"><div class="progress-fill" id="quiz-progress" style="width:0%"></div></div>
+        <div class="question-card slide-in" id="question-card">
+          <div class="question-num" id="q-num">Question 1</div>
+          <div class="question-text" id="q-text">Loading…</div>
+        </div>
+        <div class="options" id="options-container"></div>
+        <div class="feedback" id="feedback"></div>
+        <div class="quiz-nav">
+          <div class="counter"><strong id="q-idx">1</strong> / <strong id="q-total">0</strong></div>
+          <button class="next-btn" id="next-btn" onclick="nextQuestion()">Next →</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+const allFlashcards = [
+  {category:'concept', question:"How did the United Nations embody the ideals set forth in the Atlantic Charter?", answer:"The UN promoted international peace, cooperation, and self-determination — core ideals of the Atlantic Charter signed by FDR and Churchill in 1941."},
+  {category:'concept', question:"Why did so many Republicans support the claims of Joseph McCarthy?", answer:"Republicans used McCarthy's anti-communist claims as a political weapon against Democrats, and many Americans feared communist infiltration during the Red Scare."},
+  {category:'concept', question:"What prompted the Soviet Union to create the Warsaw Pact?", answer:"The Soviets formed the Warsaw Pact in 1955 in response to West Germany joining NATO — creating a rival military alliance among Eastern Bloc nations."},
+  {category:'concept', question:"What was the Eastern Bloc?", answer:"The group of Soviet-dominated communist countries in Eastern Europe, including Poland, Czechoslovakia, Hungary, Romania, Bulgaria, and East Germany."},
+  {category:'concept', question:"What caused unions to go on strike in the aftermath of World War II?", answer:"Workers demanded higher wages and better conditions after wartime wage controls were lifted, leading to massive strikes in steel, auto, and mining industries."},
+  {category:'concept', question:"How did the Marshall Plan affect the economies of European countries and the United States?", answer:"It provided $13 billion in U.S. aid to rebuild Western Europe, preventing communist spread and opening new markets for American goods — benefiting both sides."},
+  {category:'concept', question:"Why did the Soviet Union choose not to take part in the Marshall Plan?", answer:"The Soviets viewed it as American economic imperialism designed to extend U.S. influence into Eastern Europe, so they rejected it and pressured satellite states to do the same."},
+  {category:'concept', question:"Describe the connection between World War II and the spread of communism in Europe.", answer:"WWII devastated European economies, creating instability communist parties exploited. Soviet military presence in Eastern Europe let Stalin impose communist regimes."},
+  {category:'concept', question:"During which period of the Korean War did North Korea make the greatest advances?", answer:"Summer of 1950 (June–September), when North Korea pushed UN/South Korean forces nearly off the peninsula to the Pusan Perimeter."},
+  {category:'concept', question:"What happened in the Korean War between September 15 and November 25, 1950?", answer:"MacArthur's Inchon landing (Sept. 15) turned the tide. UN forces pushed north to the Chinese border, prompting China to enter the war in late November."},
+  {category:'concept', question:"In addition to the United States, who else fought alongside South Korea in the Korean War?", answer:"16 nations sent troops under the UN flag, including the UK, Canada, Australia, Turkey, and France."},
+  {category:'concept', question:"What reason did Senator Joseph McCarthy give for the United States losing the Cold War?", answer:"McCarthy claimed communist spies and traitors had infiltrated the U.S. government, military, and media — sabotaging American efforts from within."},
+  {category:'concept', question:"How did McCarthy's actions change after the election of 1952?", answer:"After Republicans won, McCarthy became Senate committee chairman and escalated his investigations — eventually targeting the U.S. Army, which led to his downfall."},
+  {category:'concept', question:"Why was China's shift to communism a serious loss to the United States?", answer:"China was the world's most populous nation. Its fall to communism in 1949 massively expanded the communist world and was seen as a major failure of U.S. foreign policy."},
+  {category:'concept', question:"Why was the Soviets' test of an atomic bomb in 1949 shocking?", answer:"The U.S. expected to hold a nuclear monopoly for years longer. The Soviet test ended that advantage, intensified the arms race, and dramatically heightened Cold War tensions."},
+  {category:'concept', question:"What might Europeans have feared about the Marshall Plan?", answer:"Some Europeans feared becoming economically dependent on the U.S. or being drawn into American Cold War politics; Eastern Europeans were pressured by the USSR to reject it."},
+  {category:'concept', question:"How did the Federal Republic of Germany come to be?", answer:"After WWII Germany was split into four occupation zones. The three Western zones (U.S., UK, France) merged in 1949 to form the democratic West Germany."},
+  {category:'people', question:"How did Chinese Nationalist Chiang Kai-shek compare to the communist Mao Zedong?", answer:"Chiang led the Nationalist government but was seen as corrupt and ineffective. Mao led a disciplined communist movement with strong peasant support, ultimately defeating Chiang."},
+  {category:'people', question:"To which place did Chiang Kai-shek flee after Mao Zedong created the People's Republic of China?", answer:"Chiang fled to Taiwan (Formosa) in 1949, where he established the Republic of China government."},
+  {category:'people', question:"Why were the 'Hollywood Ten' charged with contempt of Congress?", answer:"They were screenwriters and directors who refused to answer HUAC's questions about communist influence in Hollywood, citing First Amendment rights — and were jailed for contempt."},
+  {category:'event', question:"Why were the Venona Papers important?", answer:"The Venona Papers were decoded Soviet cables that revealed real Soviet espionage in the U.S., confirming that some accused spies (including the Rosenbergs) did work for the USSR."},
+  {category:'event', question:"What was the Manhattan Project?", answer:"The top-secret U.S. (with UK and Canada) WWII program to develop the world's first atomic bomb, culminating in the bombings of Hiroshima and Nagasaki in August 1945."},
+  {category:'vocab', question:"Define: Containment", answer:"The U.S. foreign policy strategy of preventing the further spread of communism beyond where it already existed, first articulated by diplomat George Kennan."},
+  {category:'vocab', question:"Define: Occupation Zone", answer:"A section of a defeated country controlled by an Allied power after WWII. Germany was divided into American, British, French, and Soviet occupation zones."},
+  {category:'vocab', question:"Define: Demilitarized Zone (DMZ)", answer:"A buffer zone where military activity is forbidden. In Korea, the DMZ near the 38th parallel separates North and South Korea."},
+  {category:'vocab', question:"Define: Proxy War", answer:"A conflict where two major powers (U.S. and USSR) support opposing sides in a smaller country's war rather than fighting each other directly."},
+  {category:'vocab', question:"Define: GI Bill", answer:"The Servicemen's Readjustment Act of 1944 — provided veterans with college funding, low-cost mortgages, loans, and unemployment benefits, helping build the postwar middle class."},
+  {category:'vocab', question:"Define: Rural Electrification", answer:"Government programs extending electrical power to rural and farming areas, improving quality of life and agricultural productivity across America."},
+  {category:'vocab', question:"Define: Government-in-exile", answer:"A political group that claims to be a country's legitimate government but operates outside its territory because it has been overthrown or occupied."},
+  {category:'vocab', question:"Define: Libel", answer:"A published false statement that damages a person's reputation. McCarthyism-era accusations often bordered on libel but were protected by congressional immunity."},
+  {category:'vocab', question:"Define: Iron Curtain", answer:"Winston Churchill's term for the political and ideological division between Soviet-controlled Eastern Europe and the democratic West during the Cold War."},
+  {category:'vocab', question:"Define: White-collar", answer:"Refers to professional or office workers (as opposed to blue-collar manual laborers). The postwar era saw massive growth in white-collar jobs due to economic expansion."},
+  {category:'vocab', question:"Define: Hydrogen Bomb", answer:"A thermonuclear weapon far more powerful than an atomic bomb. The U.S. tested one in 1952, the Soviets in 1953 — dramatically escalating the nuclear arms race."},
+  {category:'vocab', question:"Define: Loyalty Oath", answer:"A pledge of allegiance to the U.S. government, required of government employees during the Red Scare to prove they were not communist sympathizers."},
+  {category:'vocab', question:"Define: Liberal Consensus", answer:"The postwar agreement among most Americans that government should support social programs, economic growth, and an active foreign policy to contain communism."},
+  {category:'vocab', question:"Define: Aerospace Industry", answer:"The industry developing aircraft, missiles, and spacecraft. It boomed during the Cold War due to military demand and the Space Race between the U.S. and USSR."},
+  {category:'vocab', question:"Define: Infrastructure", answer:"Basic public systems like roads, bridges, schools, water, and power. Cold War-era spending included the Interstate Highway System, partly justified by military necessity."},
+  {category:'vocab', question:"Define: McCarthyism", answer:"The practice of making unfair, unproven accusations of communist activity or disloyalty during the early 1950s Red Scare — named after Senator Joseph McCarthy."},
+  {category:'vocab', question:"Define: Marshall Plan", answer:"The 1948 U.S. program providing over $13 billion in economic aid to rebuild Western European countries after WWII, named after Secretary of State George Marshall."},
+  {category:'vocab', question:"Define: Arms Race", answer:"The Cold War competition between the U.S. and USSR to develop and stockpile increasingly powerful nuclear and conventional weapons to achieve military superiority."},
+  {category:'vocab', question:"Define: Military-Industrial Complex", answer:"The powerful relationship between the military and defense industries. President Eisenhower famously warned against its growing influence in his 1961 farewell address."},
+  {category:'vocab', question:"Define: Subversion", answer:"Attempting to undermine or overthrow a government from within. Fear of communist subversion drove McCarthyism and HUAC investigations throughout the early 1950s."},
+  {category:'vocab', question:"Define: Domino Theory", answer:"The belief that if one country fell to communism, neighbors would follow like falling dominoes — used to justify U.S. involvement in Korea and later Vietnam."},
+];
+
+const allQuizQuestions = [
+  {question:"What U.S. foreign policy strategy aimed to stop the spread of communism beyond where it already existed?", options:["Isolationism","Containment","Détente","Imperialism"], correct:1},
+  {question:"What was the Marshall Plan?", options:["A military alliance against the USSR","A plan to divide Germany into zones","U.S. economic aid to rebuild Western Europe after WWII","A Soviet nuclear weapons program"], correct:2},
+  {question:"The 'Iron Curtain' referred to:", options:["The Berlin Wall itself","The division between communist Eastern Europe and the democratic West","A Soviet missile defense system","The border between North and South Korea"], correct:1},
+  {question:"Why did the Soviet Union reject the Marshall Plan?", options:["They had enough money to rebuild alone","They viewed it as American economic imperialism and a threat to their influence","Stalin thought it was a military trap","The U.S. never offered it to the USSR"], correct:1},
+  {question:"The Domino Theory stated that:", options:["Nuclear weapons could destroy all human life","The U.S. would never lose a war","If one country fell to communism, nearby countries would follow","Germany would start WWIII"], correct:2},
+  {question:"Where did Chiang Kai-shek flee after Mao Zedong established the People's Republic of China?", options:["Japan","Hong Kong","Taiwan","South Korea"], correct:2},
+  {question:"The Venona Papers were significant because they:", options:["Revealed U.S. plans to invade Cuba","Confirmed that real Soviet spies had infiltrated the U.S. government","Proved McCarthy was lying about communists","Were the original plans for the Marshall Plan"], correct:1},
+  {question:"The Warsaw Pact was created in response to:", options:["The formation of the United Nations","The Marshall Plan","West Germany joining NATO","The Korean War armistice"], correct:2},
+  {question:"McCarthyism is best defined as:", options:["A policy of nuclear deterrence","Making unproven accusations of communist disloyalty during the Red Scare","The U.S. strategy of economic aid to allies","A Soviet propaganda campaign"], correct:1},
+  {question:"The Manhattan Project was:", options:["The rebuilding of New York after WWII","A plan to invade Japan with ground troops","The secret program to develop the first atomic bomb","A spy network to uncover Soviet agents"], correct:2},
+  {question:"When UN forces approached the Chinese border in late 1950, China:", options:["Surrendered and requested peace talks","Launched nuclear missiles at Seoul","Entered the war on the side of North Korea","Secretly supported South Korea"], correct:2},
+  {question:"The GI Bill was designed to:", options:["Fund the nuclear weapons program","Help veterans readjust to civilian life with education and housing benefits","Create a new military draft system","Build military bases across Europe"], correct:1},
+  {question:"A 'proxy war' during the Cold War meant:", options:["A war fought with nuclear weapons","The U.S. and USSR directly fighting each other","A conflict where the U.S. and USSR supported opposing sides in another country","A United Nations peacekeeping mission"], correct:2},
+  {question:"Why was the Soviet atomic bomb test of 1949 so shocking to Americans?", options:["It was tested on U.S. soil","The U.S. expected to hold a nuclear monopoly far longer","It destroyed a Soviet city by accident","The bomb was stolen from the Manhattan Project"], correct:1},
+  {question:"The Hollywood Ten were charged with contempt of Congress because they:", options:["Made pro-Soviet propaganda films","Refused to answer HUAC's questions about communist influence","Bribed members of Congress","Leaked classified military information"], correct:1},
+  {question:"The Eastern Bloc consisted of:", options:["Western European democracies allied with the U.S.","Soviet-controlled communist countries in Eastern Europe","Asian nations fighting communism","Middle Eastern countries with Soviet oil contracts"], correct:1},
+  {question:"How did West Germany (Federal Republic of Germany) come to be in 1949?", options:["Germany won self-governance through a UN vote","The three Western Allied occupation zones merged to form a democratic state","West Germany was created after the Berlin Wall fell","The Soviet Union voluntarily gave up its zone"], correct:1},
+  {question:"The Demilitarized Zone (DMZ) in Korea is:", options:["A nuclear-free zone in Eastern Europe","A buffer zone near the 38th parallel separating North and South Korea","The area around the Inchon landing site","The border between China and North Korea"], correct:1},
+  {question:"Eisenhower's warning about the 'military-industrial complex' referred to:", options:["Soviet military buildup in Eastern Europe","The growing influence of the defense industry on U.S. government policy","NATO's unified command structure","Communist spies inside U.S. weapons factories"], correct:1},
+  {question:"Why was China's fall to communism in 1949 considered a serious blow to the U.S.?", options:["China had been a U.S. territory since WWII","It gave the USSR a Pacific naval base","China was the world's most populous country, massively expanding the communist world","It cut off U.S. access to Japanese markets"], correct:2},
+  {question:"During which phase of the Korean War did North Korea make its greatest territorial advances?", options:["Spring 1951 during the Chinese offensive","Summer 1950, pushing South Korea to the Pusan Perimeter","Winter 1950 after China entered the war","Fall 1949 before the war officially began"], correct:1},
+  {question:"What was the primary purpose of loyalty oaths required of U.S. government employees?", options:["To pledge support for the Marshall Plan","To ensure employees were not communist sympathizers","To commit employees to serve in Korea if needed","To support Senator McCarthy's investigations"], correct:1},
+];
+
+let currentFilter = 'all';
+let fcDeck = [], fcIndex = 0, isFlipped = false;
+let qShuffled = [], qIndex = 0, qCorrect = 0, qWrong = 0, answered = false;
+
+function buildDeck(f) { return f === 'all' ? [...allFlashcards] : allFlashcards.filter(c => c.category === f); }
+
+function setFilter(f, el) {
+  currentFilter = f;
+  document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
+  el.classList.add('active');
+  fcDeck = buildDeck(f); fcIndex = 0; isFlipped = false;
+  document.getElementById('flashcard').classList.remove('flipped');
+  renderFlashcard();
+}
+
+function renderFlashcard() {
+  if (!fcDeck.length) return;
+  const c = fcDeck[fcIndex];
+  isFlipped = false;
+  document.getElementById('flashcard').classList.remove('flipped');
+  document.getElementById('fc-question').textContent = c.question;
+  document.getElementById('fc-answer').textContent = c.answer;
+  document.getElementById('fc-category').textContent = c.category.charAt(0).toUpperCase() + c.category.slice(1);
+  document.getElementById('fc-current').textContent = fcIndex + 1;
+  document.getElementById('fc-total').textContent = fcDeck.length;
+  document.getElementById('fc-progress').style.width = `${((fcIndex+1)/fcDeck.length)*100}%`;
+  document.getElementById('fc-prev').disabled = fcIndex === 0;
+  document.getElementById('fc-next').disabled = fcIndex === fcDeck.length - 1;
+}
+
+function flipCard() { isFlipped = !isFlipped; document.getElementById('flashcard').classList.toggle('flipped', isFlipped); }
+function nextCard() { if (fcIndex < fcDeck.length-1) { fcIndex++; renderFlashcard(); } }
+function prevCard() { if (fcIndex > 0) { fcIndex--; renderFlashcard(); } }
+function shuffleCards() { fcDeck = buildDeck(currentFilter).sort(()=>Math.random()-0.5); fcIndex=0; renderFlashcard(); }
+
+function initQuiz() {
+  qShuffled = [...allQuizQuestions].sort(()=>Math.random()-0.5);
+  qIndex=0; qCorrect=0; qWrong=0; answered=false;
+  document.getElementById('score-screen').classList.add('hidden');
+  document.getElementById('question-ui').classList.remove('hidden');
+  renderQuestion();
+}
+
+function renderQuestion() {
+  answered = false;
+  const q = qShuffled[qIndex];
+  document.getElementById('q-num').textContent = `Question ${qIndex+1} of ${qShuffled.length}`;
+  document.getElementById('q-text').textContent = q.question;
+  document.getElementById('q-idx').textContent = qIndex+1;
+  document.getElementById('q-total').textContent = qShuffled.length;
+  document.getElementById('quiz-progress').style.width = `${(qIndex/qShuffled.length)*100}%`;
+  document.getElementById('q-correct-count').textContent = `${qCorrect} correct`;
+  document.getElementById('q-wrong-count').textContent = `${qWrong} wrong`;
+  const fb = document.getElementById('feedback');
+  fb.className = 'feedback'; fb.textContent = '';
+  const nb = document.getElementById('next-btn');
+  nb.classList.remove('show');
+  nb.textContent = qIndex === qShuffled.length-1 ? 'See Results →' : 'Next →';
+  const qcard = document.getElementById('question-card');
+  qcard.classList.remove('slide-in'); void qcard.offsetWidth; qcard.classList.add('slide-in');
+  const letters = ['A','B','C','D'];
+  const container = document.getElementById('options-container');
+  container.innerHTML = '';
+  const correctText = q.options[q.correct];
+  const shuffled = [...q.options].sort(()=>Math.random()-0.5);
+  shuffled.forEach((opt,i) => {
+    const btn = document.createElement('button');
+    btn.className = 'option-btn';
+    btn.dataset.correct = opt === correctText ? '1' : '0';
+    btn.innerHTML = `<span class="option-letter">${letters[i]}</span>${opt}`;
+    btn.onclick = () => selectOption(btn, correctText);
+    container.appendChild(btn);
+  });
+}
+
+function selectOption(btn, correctText) {
+  if (answered) return;
+  answered = true;
+  const isCorrect = btn.dataset.correct === '1';
+  document.querySelectorAll('.option-btn').forEach(b => { b.disabled = true; if (b.dataset.correct==='1') b.classList.add('correct'); });
+  if (!isCorrect) { btn.classList.add('wrong'); qWrong++; } else { qCorrect++; }
+  const fb = document.getElementById('feedback');
+  fb.textContent = isCorrect ? '✓ Correct!' : `✗ The correct answer was: ${correctText}`;
+  fb.className = `feedback show ${isCorrect ? 'correct-fb' : 'wrong-fb'}`;
+  document.getElementById('next-btn').classList.add('show');
+}
+
+function nextQuestion() { if (qIndex < qShuffled.length-1) { qIndex++; renderQuestion(); } else { showScore(); } }
+
+function showScore() {
+  document.getElementById('question-ui').classList.add('hidden');
+  document.getElementById('score-screen').classList.remove('hidden');
+  const pct = Math.round((qCorrect/qShuffled.length)*100);
+  document.getElementById('score-num').textContent = qCorrect;
+  document.getElementById('score-total').textContent = `of ${qShuffled.length}`;
+  let msg, sub;
+  if (pct===100) { msg='Perfect score! 🎉'; sub='You are absolutely ready for that test!'; }
+  else if (pct>=80) { msg='Great job! 🌟'; sub=`${pct}% — You know the Cold War really well.`; }
+  else if (pct>=65) { msg='Good effort! 💪'; sub=`${pct}% — A bit more review and you'll ace it.`; }
+  else { msg='Keep studying! 📚'; sub=`${pct}% — Review the flashcards and try again.`; }
+  document.getElementById('score-msg').textContent = msg;
+  document.getElementById('score-sub').textContent = sub;
+}
+
+function restartQuiz() { initQuiz(); }
+
+function setMode(mode) {
+  document.querySelectorAll('.mode-btn').forEach((b,i) => b.classList.toggle('active', (i===0&&mode==='flashcard')||(i===1&&mode==='quiz')));
+  document.getElementById('flashcard-mode').classList.toggle('hidden', mode!=='flashcard');
+  document.getElementById('quiz-mode').classList.toggle('hidden', mode!=='quiz');
+  if (mode==='quiz') initQuiz();
+}
+
+document.addEventListener('keydown', e => {
+  if (!document.getElementById('flashcard-mode').classList.contains('hidden')) {
+    if (e.key==='ArrowRight') nextCard();
+    if (e.key==='ArrowLeft') prevCard();
+    if (e.key===' ') { e.preventDefault(); flipCard(); }
+  }
+});
+
+fcDeck = buildDeck('all');
+renderFlashcard();
+</script>
+</body>
+</html>
