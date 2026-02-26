@@ -68,6 +68,16 @@
   .option-btn.wrong .option-letter { background: var(--red); color: #fff; border-color: var(--red); }
   .option-btn:disabled { cursor: default; }
   .option-btn:disabled:not(.correct):not(.wrong) { opacity: 0.45; }
+  .option-btn:active:not(:disabled) { transform: scale(0.98) translateX(2px); }
+  @keyframes btn-click-ripple {
+    0%   { transform: translateX(0) scale(1); }
+    18%  { transform: translateX(-5px) scale(0.985); }
+    40%  { transform: translateX(4px) scale(0.99); }
+    62%  { transform: translateX(-3px) scale(0.995); }
+    80%  { transform: translateX(2px) scale(1); }
+    100% { transform: translateX(0) scale(1); }
+  }
+  .option-btn.clicked { animation: btn-click-ripple 0.42s cubic-bezier(0.36, 0.07, 0.19, 0.97) both; }
   .feedback { padding: 13px 18px; border-radius: 12px; font-size: 0.88rem; font-weight: 500; opacity: 0; transform: translateY(8px); transition: all 0.3s ease; pointer-events: none; margin-top: 10px; }
   .feedback.show { opacity: 1; transform: translateY(0); pointer-events: auto; }
   .feedback.correct-fb { background: rgba(200,240,96,0.1); border: 1px solid rgba(200,240,96,0.2); color: var(--accent); }
@@ -80,17 +90,49 @@
   .stat-chip { padding: 7px 14px; border-radius: 50px; border: 1px solid var(--border); background: var(--surface); font-size: 0.78rem; color: var(--muted); display: flex; align-items: center; gap: 6px; }
   .stat-chip .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent); }
   .stat-chip .dot.red { background: var(--red); }
-  .score-screen { text-align: center; animation: fadeUp 0.6s ease both; }
-  .score-circle { width: 140px; height: 140px; border-radius: 50%; border: 3px solid var(--accent); display: flex; flex-direction: column; align-items: center; justify-content: center; margin: 0 auto 28px; background: radial-gradient(circle, rgba(200,240,96,0.08), transparent); animation: popIn 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) both; }
-  .score-num { font-family: 'Fraunces', serif; font-size: 2.5rem; font-weight: 300; color: var(--accent); line-height: 1; }
+  .score-screen { text-align: center; animation: fadeUp 0.6s ease both; width: 100%; }
+  .score-top-row { display: flex; align-items: center; justify-content: center; gap: 28px; margin-bottom: 20px; flex-wrap: wrap; }
+  .score-circle { width: 130px; height: 130px; border-radius: 50%; border: 3px solid var(--accent); display: flex; flex-direction: column; align-items: center; justify-content: center; background: radial-gradient(circle, rgba(200,240,96,0.08), transparent); animation: popIn 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) both; flex-shrink: 0; }
+  .score-num { font-family: 'Fraunces', serif; font-size: 2.4rem; font-weight: 300; color: var(--accent); line-height: 1; }
   .score-total { font-size: 0.8rem; color: var(--muted); margin-top: 4px; }
-  .score-msg { font-family: 'Fraunces', serif; font-size: 1.5rem; font-weight: 300; margin-bottom: 10px; }
-  .score-sub { color: var(--muted); font-size: 0.88rem; margin-bottom: 28px; line-height: 1.6; }
-  .score-actions { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
-  .restart-btn { padding: 13px 28px; border-radius: 50px; border: 1px solid var(--border); background: var(--surface); color: var(--text); font-family: 'DM Sans', sans-serif; font-size: 0.88rem; cursor: pointer; transition: all 0.2s ease; }
+  .grade-badge { font-family: 'Fraunces', serif; font-size: 4.5rem; font-weight: 500; line-height: 1; animation: popIn 0.6s 0.15s cubic-bezier(0.34, 1.56, 0.64, 1) both; }
+  .grade-badge.A  { color: var(--accent); }
+  .grade-badge.B  { color: #7dd87a; }
+  .grade-badge.C  { color: var(--accent2); }
+  .grade-badge.D  { color: #f0b060; }
+  .grade-badge.F  { color: var(--red); }
+  .score-msg { font-family: 'Fraunces', serif; font-size: 1.4rem; font-weight: 300; margin-bottom: 6px; }
+  .score-pct { font-size: 2rem; font-weight: 500; color: var(--accent); margin-bottom: 20px; letter-spacing: -0.02em; }
+  .grade-breakdown { display: flex; align-items: center; justify-content: center; gap: 0; background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 16px 28px; margin: 0 auto 24px; width: fit-content; }
+  .breakdown-item { text-align: center; padding: 0 20px; font-size: 0.88rem; color: var(--muted); }
+  .breakdown-item span { display: block; font-size: 1.5rem; font-weight: 500; font-family: 'Fraunces', serif; margin-bottom: 2px; }
+  .correct-bd span { color: var(--accent); }
+  .wrong-bd span { color: var(--red); }
+  .total-bd span { color: var(--text); }
+  .breakdown-divider { width: 1px; height: 40px; background: var(--border); flex-shrink: 0; }
+  .score-actions { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; margin-bottom: 8px; }
+  .restart-btn { padding: 12px 24px; border-radius: 50px; border: 1px solid var(--border); background: var(--surface); color: var(--text); font-family: 'DM Sans', sans-serif; font-size: 0.85rem; cursor: pointer; transition: all 0.2s ease; }
   .restart-btn:hover { border-color: var(--accent); color: var(--accent); }
   .restart-btn.primary { background: var(--accent); color: #111; border-color: var(--accent); }
   .restart-btn.primary:hover { box-shadow: 0 8px 24px rgba(200,240,96,0.2); color: #111; }
+  .restart-btn.accent2 { border-color: var(--accent2); color: var(--accent2); }
+  .restart-btn.accent2:hover { background: rgba(240,160,96,0.08); }
+  /* Missed review */
+  .review-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px; flex-wrap: wrap; gap: 12px; }
+  .review-title { font-family: 'Fraunces', serif; font-size: 1.3rem; font-weight: 300; display: flex; align-items: center; gap: 10px; }
+  .missed-count-badge { background: var(--red); color: #fff; font-family: 'DM Sans', sans-serif; font-size: 0.75rem; font-weight: 500; padding: 2px 9px; border-radius: 50px; }
+  .back-btn { padding: 8px 18px; border-radius: 50px; border: 1px solid var(--border); background: var(--surface); color: var(--muted); font-family: 'DM Sans', sans-serif; font-size: 0.82rem; cursor: pointer; transition: all 0.2s ease; }
+  .back-btn:hover { border-color: var(--accent); color: var(--accent); }
+  .missed-item { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 24px; margin-bottom: 14px; text-align: left; position: relative; overflow: hidden; animation: fadeUp 0.4s ease both; }
+  .missed-item::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px; background: linear-gradient(90deg, var(--red), var(--accent2)); }
+  .missed-q-label { font-size: 0.68rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--red); margin-bottom: 10px; font-weight: 500; }
+  .missed-q-text { font-family: 'Fraunces', serif; font-size: 1.05rem; font-weight: 300; line-height: 1.5; margin-bottom: 16px; color: var(--text); }
+  .missed-answers { display: flex; flex-direction: column; gap: 8px; }
+  .missed-answer { padding: 11px 16px; border-radius: 10px; font-size: 0.85rem; display: flex; align-items: flex-start; gap: 10px; }
+  .missed-answer.your-ans { background: rgba(240,96,112,0.08); border: 1px solid rgba(240,96,112,0.2); color: var(--red); }
+  .missed-answer.right-ans { background: rgba(200,240,96,0.08); border: 1px solid rgba(200,240,96,0.2); color: var(--accent); }
+  .ans-icon { font-size: 0.85rem; flex-shrink: 0; margin-top: 1px; }
+  .ans-label { font-size: 0.68rem; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; opacity: 0.7; display: block; margin-bottom: 2px; }
   @keyframes fadeUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
   @keyframes popIn { from { opacity: 0; transform: scale(0.6); } to { opacity: 1; transform: scale(1); } }
   @keyframes pulse-correct { 0% { transform: scale(1); } 50% { transform: scale(1.01); } 100% { transform: scale(1); } }
@@ -164,15 +206,38 @@
   <div id="quiz-mode" class="content hidden">
     <div id="quiz-content" style="width:100%;max-width:680px;">
       <div id="score-screen" class="score-screen hidden">
-        <div class="score-circle">
-          <div class="score-num" id="score-num">0</div>
-          <div class="score-total" id="score-total">of 0</div>
+        <div id="results-summary">
+          <div class="score-top-row">
+            <div class="score-circle">
+              <div class="score-num" id="score-num">0</div>
+              <div class="score-total" id="score-total">of 0</div>
+            </div>
+            <div class="grade-badge" id="grade-badge">A</div>
+          </div>
+          <div class="score-msg" id="score-msg">Good effort!</div>
+          <div class="score-pct" id="score-pct">0%</div>
+          <div class="grade-breakdown" id="grade-breakdown">
+            <div class="breakdown-item correct-bd"><span id="bd-correct">0</span> correct</div>
+            <div class="breakdown-divider"></div>
+            <div class="breakdown-item wrong-bd"><span id="bd-wrong">0</span> missed</div>
+            <div class="breakdown-divider"></div>
+            <div class="breakdown-item total-bd"><span id="bd-total">0</span> total</div>
+          </div>
+          <div class="score-actions">
+            <button class="restart-btn primary" onclick="restartQuiz()">Try Again</button>
+            <button class="restart-btn accent2" id="review-missed-btn" onclick="showMissedReview()">Review Missed</button>
+            <button class="restart-btn" onclick="setMode('flashcard')">Flashcards</button>
+          </div>
         </div>
-        <div class="score-msg" id="score-msg">Good effort!</div>
-        <div class="score-sub" id="score-sub">Keep practicing!</div>
-        <div class="score-actions">
-          <button class="restart-btn primary" onclick="restartQuiz()">Try Again</button>
-          <button class="restart-btn" onclick="setMode('flashcard')">Review Flashcards</button>
+        <div id="missed-review" class="hidden">
+          <div class="review-header">
+            <button class="back-btn" onclick="showResultsSummary()">← Back to Results</button>
+            <div class="review-title">Missed Questions <span class="missed-count-badge" id="missed-count-badge">0</span></div>
+          </div>
+          <div id="missed-list"></div>
+          <div style="text-align:center;margin-top:28px;">
+            <button class="restart-btn primary" onclick="restartQuiz()">Retake Quiz</button>
+          </div>
         </div>
       </div>
       <div id="question-ui">
@@ -247,57 +312,58 @@ const allFlashcards = [
 
 const allQuizQuestions = [
   // ── CONCEPTS ──
-  {question:"How did the United Nations embody the ideals of the Atlantic Charter?", options:["It created a military alliance to fight the USSR","It promoted international peace, cooperation, and self-determination as the Atlantic Charter called for","It replaced the Atlantic Charter entirely","It gave the U.S. veto power over all world decisions"], correct:1},
-  {question:"Why did so many Republicans support Joseph McCarthy's claims?", options:["They genuinely believed every accusation he made","McCarthy had evidence that all accused were spies","They used his anti-communist claims as a political weapon against Democrats","Republicans passed a law requiring loyalty investigations"], correct:1},
-  {question:"What prompted the Soviet Union to create the Warsaw Pact in 1955?", options:["The United States testing the hydrogen bomb","The Soviet Union being expelled from the United Nations","West Germany joining NATO","The Marshall Plan excluding Eastern Europe"], correct:2},
-  {question:"What was the Eastern Bloc?", options:["Western European countries allied with the United States","The group of Soviet-dominated communist countries in Eastern Europe","Asian nations that adopted communism after WWII","Countries that received Marshall Plan aid"], correct:1},
-  {question:"What caused major labor strikes in the United States after World War II?", options:["Workers protesting the use of atomic bombs on Japan","Unions demanding higher wages after wartime wage controls were lifted","Soldiers refusing to return home from Europe","Workers opposing the Marshall Plan"], correct:1},
-  {question:"How did the Marshall Plan benefit both Western Europe AND the United States?", options:["It gave the U.S. military bases across Europe in exchange for aid","It rebuilt European economies, prevented communist spread, and opened new markets for American goods","It only benefited Europe; the U.S. went into debt funding it","It created a shared European-American currency"], correct:1},
-  {question:"Why did the Soviet Union refuse to participate in the Marshall Plan?", options:["The USSR was not invited to participate","Stalin thought the aid money was counterfeit","They viewed it as American economic imperialism designed to extend U.S. influence into Eastern Europe","The Soviet economy was already fully recovered from WWII"], correct:2},
-  {question:"What is the connection between World War II and the spread of communism in Europe?", options:["WWII had no connection to communism's spread in Europe","The U.S. deliberately spread communism after WWII","WWII devastated European economies, creating instability that communist parties exploited, aided by Soviet military presence","Communism spread because the U.S. refused to help Europe rebuild"], correct:2},
-  {question:"During which period of the Korean War did North Korea make its greatest advances?", options:["Spring 1951 during China's major offensive","Summer 1950, pushing South Korean and UN forces to the Pusan Perimeter","Winter 1950 after China entered the war","Fall 1952 near the end of the conflict"], correct:1},
-  {question:"What happened in the Korean War between September 15 and November 25, 1950?", options:["A peace treaty was signed and fighting paused","MacArthur's Inchon landing turned the tide; UN forces pushed north until China entered the war in November","North Korea surrendered after the Inchon landing","The Soviet Union entered the war on North Korea's side"], correct:1},
-  {question:"Besides the United States, who else fought alongside South Korea in the Korean War?", options:["Only South Korean troops — no other nations participated","Japan and China fought alongside South Korea","16 nations sent UN troops including the UK, Canada, Australia, Turkey, and France","Only NATO member countries participated"], correct:2},
-  {question:"What reason did McCarthy give for the U.S. losing ground in the Cold War?", options:["The U.S. military was too small","Nuclear weapons were too expensive to build","Communist spies and traitors had infiltrated the U.S. government, military, and media","The Marshall Plan had weakened the American economy"], correct:2},
-  {question:"How did McCarthy's behavior change after the 1952 Republican election victory?", options:["He stopped making accusations after his party won","He retired from politics satisfied with the results","He became Senate committee chairman and escalated investigations, eventually targeting the U.S. Army — leading to his downfall","He focused exclusively on Hollywood investigations"], correct:2},
-  {question:"Why was China's shift to communism in 1949 considered a major loss for the United States?", options:["China had been an American territory since the Spanish-American War","China's vast population made it the most significant expansion of the communist world, seen as a major foreign policy failure","The U.S. had invested billions of dollars developing China's economy","China had promised to fight against the Soviet Union"], correct:1},
-  {question:"Why was the Soviet atomic bomb test of 1949 so alarming to Americans?", options:["It was tested inside the United States without warning","The bomb destroyed a major Soviet city by accident","The U.S. expected to hold a nuclear monopoly much longer; the test ended that advantage and intensified the arms race","The Soviets announced they would bomb American cities"], correct:2},
-  {question:"What might Europeans have feared about accepting the Marshall Plan?", options:["That the aid money would cause inflation in Europe","That the U.S. would demand military service in return","Becoming economically dependent on the U.S. or being pulled into American Cold War politics","That the USSR would invade them immediately"], correct:1},
-  {question:"How did the Federal Republic of Germany (West Germany) come to exist in 1949?", options:["Germany held free elections and voted to create a new democratic state","The Soviet Union agreed to reunify Germany as one democracy","The three Western Allied occupation zones (U.S., UK, France) merged to form a democratic state","The United Nations created West Germany by dividing Berlin"], correct:2},
+  {question:"How did the United Nations reflect the ideals of the Atlantic Charter?", options:["It formed a military alliance against the USSR","It promoted peace, cooperation, and self-determination","It gave the U.S. permanent control over all votes","It replaced national governments with one world body"], correct:1},
+  {question:"Why did many Republicans back McCarthy's anti-communist crusade?", options:["They verified his evidence before supporting him","They feared losing elections if they opposed him","They used it as a political weapon against Democrats","Congress required them to support his investigations"], correct:2},
+  {question:"What directly triggered the creation of the Warsaw Pact in 1955?", options:["The U.S. testing the first hydrogen bomb","The Soviet Union leaving the United Nations","West Germany being admitted into NATO","Stalin's death leaving the USSR without leadership"], correct:2},
+  {question:"The Eastern Bloc was made up of:", options:["Western democracies that partnered with the U.S.","Soviet-dominated communist nations in Eastern Europe","Asian countries that rejected Marshall Plan aid","Neutral nations caught between the U.S. and USSR"], correct:1},
+  {question:"What sparked the massive labor strikes in the U.S. right after WWII?", options:["Workers angry about atomic bomb use in Japan","Unions pushing for higher wages once wartime controls lifted","Veterans refusing factory jobs after returning home","Workers protesting U.S. involvement in Korea"], correct:1},
+  {question:"How did the Marshall Plan affect U.S. interests abroad?", options:["It gave the U.S. military bases in exchange for aid","It rebuilt European economies and opened new American export markets","It forced European nations to adopt U.S. laws","It paid Europe's war debts to the United States"], correct:1},
+  {question:"Why did the USSR refuse to join the Marshall Plan?", options:["The U.S. never formally invited the Soviet Union","Stalin believed the aid dollars were counterfeit","They saw it as U.S. imperialism aimed at influencing Eastern Europe","The Soviet economy had already fully recovered from the war"], correct:2},
+  {question:"How did WWII help communism spread across Europe?", options:["The U.S. secretly promoted communism post-war","Communist parties won democratic elections across Europe","War devastation created instability that communists exploited, backed by Soviet troops","Britain and France invited Soviet advisors into their colonies"], correct:2},
+  {question:"When did North Korea make its greatest military advances in the Korean War?", options:["Spring 1951, during China's big offensive push","Summer 1950, nearly pushing UN forces off the peninsula","Winter 1950, right after China entered the conflict","Fall 1952, in the final months before a ceasefire"], correct:1},
+  {question:"What happened in Korea between September 15 and November 25, 1950?", options:["A ceasefire was signed and both sides pulled back","MacArthur landed at Inchon, then China entered as UN forces neared the border","North Korea surrendered following the Inchon landing","The Soviet Union sent troops to reinforce North Korea"], correct:1},
+  {question:"Which nations fought alongside the U.S. in South Korea's defense?", options:["Only South Korean troops fought; the U.S. acted alone","Japan and Australia but no European nations","16 countries under the UN flag, including UK, Canada, and Turkey","Only NATO member nations contributed troops"], correct:2},
+  {question:"McCarthy claimed the Cold War was going badly because:", options:["America's military spending was far too low","Nuclear weapons were draining the federal budget","Communist infiltrators had sabotaged the government from within","The Marshall Plan had weakened American industry"], correct:2},
+  {question:"How did McCarthy's actions shift after Republicans won in 1952?", options:["He quietly dropped his accusations once his party held power","He retired after achieving his anti-communist goals","He gained a Senate chairmanship, escalated attacks, then collapsed after targeting the Army","He narrowed his focus exclusively to Hollywood celebrities"], correct:2},
+  {question:"Why was China's communist revolution in 1949 seen as a Cold War disaster for the U.S.?", options:["China had been a formal U.S. territory since the 1800s","The world's most populous nation joining communism massively shifted the global balance","The U.S. had spent billions building China's democratic institutions","China had signed a treaty promising to oppose the Soviet Union"], correct:1},
+  {question:"Why did the Soviet atom bomb test of 1949 shock the American public?", options:["The bomb was secretly detonated on American soil","A Soviet city was accidentally destroyed during the test","Americans assumed the U.S. nuclear monopoly would last much longer","Soviet leaders threatened a nuclear strike on Washington"], correct:2},
+  {question:"What concern might Western Europeans have had about the Marshall Plan?", options:["That inflation would destroy their currencies","That they would owe the U.S. soldiers in exchange for aid","That it would make them economically dependent on or politically tied to the U.S.","That the Soviets would retaliate with immediate military invasion"], correct:2},
+  {question:"How did West Germany (Federal Republic of Germany) come to exist?", options:["All Germans voted in a UN-supervised national election","The Soviets voluntarily handed over their occupation zone","The three Western Allied zones merged into one democratic state","The United Nations drew a permanent border dividing Germany"], correct:2},
   // ── PEOPLE ──
-  {question:"How did Chiang Kai-shek compare to Mao Zedong during China's civil war?", options:["Both led communist movements competing for the same followers","Chiang was seen as corrupt and ineffective while Mao built a disciplined movement with strong peasant support","Chiang was the popular revolutionary; Mao was the corrupt leader","They were allies who later had a falling out"], correct:1},
-  {question:"Where did Chiang Kai-shek flee after Mao established the People's Republic of China in 1949?", options:["Japan","Hong Kong","South Korea","Taiwan (Formosa)"], correct:3},
-  {question:"Why were the Hollywood Ten held in contempt of Congress?", options:["They made films that directly criticized U.S. military strategy","They donated money to the Communist Party of America","They refused to answer HUAC's questions about communist influence in Hollywood, citing First Amendment rights","They were caught leaking classified government scripts to the Soviets"], correct:2},
+  {question:"How did Chiang Kai-shek and Mao Zedong differ as leaders?", options:["Both were communists who competed for Soviet support","Chiang was seen as corrupt and weak; Mao built disciplined peasant loyalty","Chiang was the revolutionary hero; Mao was the oppressive ruler","They were wartime allies who split over economic policy"], correct:1},
+  {question:"After losing China's civil war, where did Chiang Kai-shek establish his government?", options:["Japan","Hong Kong","South Korea","Taiwan (Formosa)"], correct:3},
+  {question:"Why were the Hollywood Ten jailed for contempt of Congress?", options:["They produced films that contained Soviet propaganda","They gave money directly to the Communist Party USA","They refused to answer HUAC's questions, citing their First Amendment rights","They leaked classified military scripts to Soviet agents"], correct:2},
   // ── EVENTS ──
-  {question:"Why were the Venona Papers historically significant?", options:["They revealed the complete U.S. nuclear weapons program to the public","They were decoded Soviet cables proving real Soviet espionage had occurred inside the U.S. government","They showed McCarthy had fabricated all of his evidence","They were the original blueprints for the Marshall Plan"], correct:1},
-  {question:"What was the Manhattan Project?", options:["A postwar plan to rebuild New York City's infrastructure","A Soviet spy operation targeting U.S. nuclear scientists","The top-secret U.S., UK, and Canadian program to develop the world's first atomic bomb","A diplomatic effort to prevent nuclear proliferation"], correct:2},
+  {question:"What made the Venona Papers historically important?", options:["They exposed the entire U.S. nuclear weapons blueprint","They were decoded Soviet messages proving real spies had infiltrated U.S. agencies","They proved McCarthy had invented all of his accusations","They contained the original drafts of the Marshall Plan"], correct:1},
+  {question:"What was the Manhattan Project?", options:["A postwar program to modernize New York's harbor","A Soviet espionage network targeting American scientists","The secret Allied program that built the first atomic bomb","A diplomatic initiative to prevent nuclear weapons spread"], correct:2},
   // ── VOCABULARY ──
-  {question:"Containment, as a U.S. foreign policy, meant:", options:["Destroying communist governments wherever they existed","Isolating the U.S. from all foreign conflicts","Preventing communism from spreading to new countries beyond where it already existed","Containing Soviet nuclear weapons through arms treaties"], correct:2},
-  {question:"An 'occupation zone' after WWII referred to:", options:["A neutral territory under United Nations control","A section of a defeated country controlled and administered by an Allied power","A demilitarized area between North and South Korea","A zone where atomic weapons could not be tested"], correct:1},
-  {question:"The Demilitarized Zone (DMZ) in Korea is:", options:["A nuclear-weapons-free zone covering all of Asia","A buffer zone near the 38th parallel where military activity is forbidden, separating North and South Korea","The area around Inchon where MacArthur's famous landing took place","The border zone between China and North Korea"], correct:1},
-  {question:"A 'proxy war' during the Cold War meant:", options:["A war fought entirely with nuclear weapons","A conflict where the U.S. and USSR directly fought each other on a battlefield","A conflict where the U.S. and USSR each supported opposing sides in another country's war rather than fighting directly","A war that was secretly funded by the United Nations"], correct:2},
-  {question:"The GI Bill (1944) primarily provided:", options:["Funding for the nuclear weapons program","College education benefits, low-cost mortgages, and loans to help WWII veterans readjust to civilian life","A new military draft system for the Cold War","Government jobs for soldiers who refused to leave the military"], correct:1},
-  {question:"Rural electrification programs were designed to:", options:["Power new nuclear weapons facilities in remote areas","Extend electrical power to farming and rural areas of America","Create jobs for veterans returning from WWII","Build the infrastructure for the interstate highway system"], correct:1},
-  {question:"A 'government-in-exile' is:", options:["A puppet government installed by an occupying power","A political group that claims to be a country's legitimate government but operates outside its territory","A temporary government formed during a revolution","A government that has declared neutrality in the Cold War"], correct:1},
-  {question:"Libel is best defined as:", options:["Refusing to testify before Congress","Spying for a foreign government","A published false statement that damages a person's reputation","Publicly supporting communist ideology"], correct:2},
-  {question:"The 'Iron Curtain' was a term used to describe:", options:["The physical barrier built around West Berlin","The political and ideological division between Soviet-controlled Eastern Europe and the democratic West","The Soviet Union's nuclear missile shield","The border fence between East and West Germany"], correct:1},
-  {question:"'White-collar' workers in the postwar era referred to:", options:["Factory and industrial manual laborers","Government spies working undercover","Professional and office workers, whose numbers grew massively due to postwar economic expansion","Soldiers who returned from WWII and entered government service"], correct:2},
-  {question:"The hydrogen bomb differed from the atomic bomb in that:", options:["It used conventional explosives rather than nuclear reactions","It was a thermonuclear weapon far more powerful than the atomic bomb, tested by the U.S. in 1952 and the USSR in 1953","It could only be delivered by submarine","It was designed for defense rather than offense"], correct:1},
-  {question:"A 'loyalty oath' required of U.S. government employees during the Red Scare was:", options:["A pledge to support the Marshall Plan financially","A promise to report any foreign travel to the FBI","A pledge of allegiance to the U.S. government, used to prove employees were not communist sympathizers","A commitment to serve in the military if called upon"], correct:2},
-  {question:"The 'liberal consensus' of the postwar era described:", options:["An agreement between the U.S. and USSR to limit nuclear weapons","The broad American agreement that government should support social programs, economic growth, and an active foreign policy to contain communism","A secret deal between Democrats and Republicans to share power","The European nations' agreement to accept the Marshall Plan"], correct:1},
-  {question:"The aerospace industry boomed during the Cold War primarily because:", options:["Commercial airline travel became affordable for the middle class","Military demand for aircraft and missiles and the Space Race between the U.S. and USSR drove massive growth","The GI Bill funded aerospace education programs","European nations outsourced their aircraft manufacturing to the U.S."], correct:1},
-  {question:"Cold War-era 'infrastructure' spending by the U.S. government included:", options:["Building nuclear fallout shelters in every American city","Funding for European reconstruction through the Marshall Plan","Roads, bridges, and public systems like the Interstate Highway System, partly justified by military necessity","Expanding the U.S. naval fleet to counter Soviet submarines"], correct:2},
-  {question:"McCarthyism refers to:", options:["A policy of negotiating with communist countries","The practice of making unfair, unproven accusations of communist disloyalty during the early 1950s Red Scare","Senator McCarthy's foreign policy platform for the 1952 election","A government loyalty program created by President Truman"], correct:1},
-  {question:"The Marshall Plan was named after:", options:["General George Marshall, who commanded Allied forces in Europe during WWII","Secretary of State George Marshall, who proposed the economic aid program for Western Europe","President Harry Truman's chief of staff, Marshall Hopkins","General Thurgood Marshall, who oversaw European reconstruction"], correct:0},
-  {question:"The 'arms race' during the Cold War was:", options:["A competition between U.S. states to produce the most military equipment","The race to be the first country to land on the moon","The U.S.-Soviet competition to develop and stockpile increasingly powerful nuclear and conventional weapons","A United Nations program to reduce global weapons stockpiles"], correct:2},
-  {question:"The 'military-industrial complex,' as Eisenhower warned about, referred to:", options:["Soviet spy networks inside U.S. defense factories","NATO's integrated military command structure","The growing and potentially dangerous relationship between the defense industry and the U.S. military establishment","Communist infiltration of American weapons programs"], correct:2},
-  {question:"'Subversion' as feared during the Cold War meant:", options:["A foreign military invasion of U.S. territory","Publicly protesting U.S. foreign policy","Attempting to undermine or overthrow the government from within — the core fear driving HUAC and McCarthyism","Writing anti-government newspaper articles"], correct:2},
-  {question:"The Domino Theory, used to justify U.S. intervention in Korea and Vietnam, held that:", options:["Nuclear weapons would eventually destroy all governments equally","The U.S. economy would collapse if it lost too many wars","If one country fell to communism, neighboring countries would follow like a chain of falling dominoes","Democratic governments always outlast communist ones"], correct:2},
+  {question:"The U.S. policy of 'containment' aimed to:", options:["Destroy communism wherever it already existed","Keep the U.S. out of all overseas conflicts","Stop communism from spreading beyond its current borders","Control Soviet nuclear weapons through direct treaties"], correct:2},
+  {question:"An 'occupation zone' after WWII was:", options:["A UN-controlled neutral buffer territory","A section of a defeated nation run by an Allied power","A demilitarized strip separating the two Koreas","A region where nuclear testing was permanently banned"], correct:1},
+  {question:"The DMZ in Korea refers to:", options:["A nuclear-free belt covering all of East Asia","A fortified buffer near the 38th parallel dividing the two Koreas","The coastal zone near Inchon where MacArthur landed","The mountainous border region between China and North Korea"], correct:1},
+  {question:"A 'proxy war' during the Cold War was:", options:["A war using only nuclear or chemical weapons","A direct military clash between U.S. and Soviet armies","A conflict where the U.S. and USSR backed opposing sides indirectly","A secret war funded entirely by the United Nations"], correct:2},
+  {question:"The GI Bill mainly offered veterans:", options:["Funding to work in the nuclear weapons industry","Education, housing loans, and economic support for civilian reentry","A mandatory peacetime military service requirement","Priority hiring for federal government positions"], correct:1},
+  {question:"Rural electrification programs primarily aimed to:", options:["Power remote nuclear research facilities","Bring electrical service to farms and rural communities","Employ veterans returning from overseas service","Build out the Interstate Highway System's lighting grid"], correct:1},
+  {question:"A 'government-in-exile' is best described as:", options:["A puppet regime set up by an occupying foreign power","A legitimate government operating outside its own country after being removed","A temporary wartime council governing until peace returns","A neutral government refusing to take sides in a conflict"], correct:1},
+  {question:"Libel is:", options:["The crime of refusing to testify before Congress","Passing government secrets to a foreign power","A false published statement that harms someone's reputation","Publicly declaring support for a foreign political ideology"], correct:2},
+  {question:"Churchill used 'Iron Curtain' to describe:", options:["The physical wall dividing East and West Berlin","The ideological divide separating communist East from democratic West Europe","The Soviet Union's anti-missile defense network","The heavily guarded fence along the East-West German border"], correct:1},
+  {question:"'White-collar' workers in postwar America were:", options:["Industrial laborers in steel and auto factories","Undercover government investigators during the Red Scare","Office and professional workers whose ranks swelled in the booming economy","Veterans who returned and immediately joined the federal workforce"], correct:2},
+  {question:"The hydrogen bomb was different from the atomic bomb because:", options:["It relied on chemical rather than nuclear reactions","It was far more powerful — a thermonuclear weapon tested in 1952–53","It was small enough to be fired from a naval vessel","It was built purely for defensive, not offensive, purposes"], correct:1},
+  {question:"A 'loyalty oath' for government workers during the Red Scare was:", options:["A financial pledge to support Marshall Plan funding","A promise to report overseas travel to federal authorities","A sworn statement that the employee was not a communist sympathizer","A military service commitment in case of Soviet invasion"], correct:2},
+  {question:"The postwar 'liberal consensus' referred to:", options:["A U.S.-Soviet agreement to limit nuclear arsenals","Broad American support for social programs, economic growth, and anti-communist foreign policy","A backroom deal splitting power between Democrats and Republicans","Western Europe's collective agreement to accept American aid"], correct:1},
+  {question:"The aerospace industry expanded rapidly during the Cold War mainly due to:", options:["Mass commercial air travel becoming affordable for average Americans","Military demand and the U.S.-Soviet Space Race driving massive government investment","The GI Bill creating thousands of aerospace engineering scholarships","European nations contracting U.S. companies to build their air forces"], correct:1},
+  {question:"Cold War 'infrastructure' investment by the U.S. government notably included:", options:["Nuclear fallout shelters built beneath every major American city","Rebuilding European roads and factories through the Marshall Plan","The Interstate Highway System, partly justified by military transport needs","A massive expansion of the Atlantic naval fleet"], correct:2},
+  {question:"McCarthyism is best described as:", options:["A diplomatic strategy for engaging with communist regimes","Making reckless unproven accusations of communist disloyalty during the Red Scare","McCarthy's official foreign policy agenda for his 1952 presidential run","A loyalty screening program launched by President Eisenhower"], correct:1},
+  {question:"The Marshall Plan was named after Secretary of State George Marshall because:", options:["He commanded all Allied forces in Europe throughout WWII","He proposed and championed the European economic aid program","He was Truman's chief of staff who drafted the legislation","He personally delivered the aid packages to European capitals"], correct:1},
+  {question:"The Cold War 'arms race' was:", options:["A competition among U.S. states to win Defense Department contracts","A sprint to land the first humans on the moon","The U.S.-Soviet buildup of increasingly powerful nuclear and conventional weapons","A UN disarmament program both sides publicly supported"], correct:2},
+  {question:"Eisenhower's warning about the 'military-industrial complex' described:", options:["Soviet spy rings embedded in U.S. weapons factories","NATO's growing centralized military command structure","The dangerous, growing influence of the defense industry over U.S. government decisions","Communist efforts to infiltrate American weapons manufacturing plants"], correct:2},
+  {question:"During the Red Scare, 'subversion' referred to:", options:["A direct foreign military attack on U.S. territory","Peaceful protests against U.S. Cold War foreign policy","Secretly working to undermine or overthrow the government from the inside","Publishing newspaper editorials critical of American democracy"], correct:2},
+  {question:"The Domino Theory held that:", options:["Nuclear war would destroy all nations simultaneously and equally","Each economic depression in one country would trigger collapse in others","If one nation fell to communism, its neighbors would likely follow","Democracies were naturally stronger and would always outlast communist states"], correct:2},
 ];
 
 let currentFilter = 'all';
 let fcDeck = [], fcIndex = 0, isFlipped = false;
 let qShuffled = [], qIndex = 0, qCorrect = 0, qWrong = 0, answered = false;
+let missedQuestions = []; // {question, yourAnswer, correctAnswer}
 
 function buildDeck(f) { return f === 'all' ? [...allFlashcards] : allFlashcards.filter(c => c.category === f); }
 
@@ -332,7 +398,7 @@ function shuffleCards() { fcDeck = buildDeck(currentFilter).sort(()=>Math.random
 
 function initQuiz() {
   qShuffled = [...allQuizQuestions].sort(()=>Math.random()-0.5);
-  qIndex=0; qCorrect=0; qWrong=0; answered=false;
+  qIndex=0; qCorrect=0; qWrong=0; answered=false; missedQuestions=[];
   document.getElementById('score-screen').classList.add('hidden');
   document.getElementById('question-ui').classList.remove('hidden');
   renderQuestion();
@@ -373,9 +439,19 @@ function renderQuestion() {
 function selectOption(btn, correctText) {
   if (answered) return;
   answered = true;
+  btn.classList.add('clicked');
+  btn.addEventListener('animationend', () => btn.classList.remove('clicked'), {once: true});
   const isCorrect = btn.dataset.correct === '1';
   document.querySelectorAll('.option-btn').forEach(b => { b.disabled = true; if (b.dataset.correct==='1') b.classList.add('correct'); });
-  if (!isCorrect) { btn.classList.add('wrong'); qWrong++; } else { qCorrect++; }
+  if (!isCorrect) {
+    btn.classList.add('wrong');
+    qWrong++;
+    missedQuestions.push({
+      question: qShuffled[qIndex].question,
+      yourAnswer: btn.querySelector('.option-letter') ? btn.textContent.replace(btn.querySelector('.option-letter').textContent, '').trim() : btn.textContent.trim(),
+      correctAnswer: correctText
+    });
+  } else { qCorrect++; }
   const fb = document.getElementById('feedback');
   fb.textContent = isCorrect ? '✓ Correct!' : `✗ The correct answer was: ${correctText}`;
   fb.className = `feedback show ${isCorrect ? 'correct-fb' : 'wrong-fb'}`;
@@ -384,19 +460,92 @@ function selectOption(btn, correctText) {
 
 function nextQuestion() { if (qIndex < qShuffled.length-1) { qIndex++; renderQuestion(); } else { showScore(); } }
 
+function getLetterGrade(pct) {
+  if (pct >= 93) return 'A';
+  if (pct >= 90) return 'A';
+  if (pct >= 87) return 'B';
+  if (pct >= 83) return 'B';
+  if (pct >= 80) return 'B';
+  if (pct >= 77) return 'C';
+  if (pct >= 73) return 'C';
+  if (pct >= 70) return 'C';
+  if (pct >= 67) return 'D';
+  if (pct >= 63) return 'D';
+  if (pct >= 60) return 'D';
+  return 'F';
+}
+
 function showScore() {
   document.getElementById('question-ui').classList.add('hidden');
   document.getElementById('score-screen').classList.remove('hidden');
-  const pct = Math.round((qCorrect/qShuffled.length)*100);
+  document.getElementById('results-summary').classList.remove('hidden');
+  document.getElementById('missed-review').classList.add('hidden');
+
+  const pct = Math.round((qCorrect / qShuffled.length) * 100);
+  const grade = getLetterGrade(pct);
+
   document.getElementById('score-num').textContent = qCorrect;
   document.getElementById('score-total').textContent = `of ${qShuffled.length}`;
-  let msg, sub;
-  if (pct===100) { msg='Perfect score! 🎉'; sub='You are absolutely ready for that test!'; }
-  else if (pct>=80) { msg='Great job! 🌟'; sub=`${pct}% — You know the Cold War really well.`; }
-  else if (pct>=65) { msg='Good effort! 💪'; sub=`${pct}% — A bit more review and you'll ace it.`; }
-  else { msg='Keep studying! 📚'; sub=`${pct}% — Review the flashcards and try again.`; }
+  document.getElementById('score-pct').textContent = `${pct}%`;
+  document.getElementById('bd-correct').textContent = qCorrect;
+  document.getElementById('bd-wrong').textContent = qWrong;
+  document.getElementById('bd-total').textContent = qShuffled.length;
+
+  const gb = document.getElementById('grade-badge');
+  const gradeClass = grade.charAt(0);
+  gb.textContent = pct >= 93 ? 'A+' : pct >= 90 ? 'A' : pct >= 87 ? 'B+' : pct >= 83 ? 'B' : pct >= 80 ? 'B-' : pct >= 77 ? 'C+' : pct >= 73 ? 'C' : pct >= 70 ? 'C-' : pct >= 67 ? 'D+' : pct >= 63 ? 'D' : pct >= 60 ? 'D-' : 'F';
+  gb.className = `grade-badge ${gradeClass}`;
+
+  let msg;
+  if (pct === 100) msg = 'Perfect score! 🎉';
+  else if (pct >= 90) msg = 'Excellent work! 🌟';
+  else if (pct >= 80) msg = 'Great job! 💪';
+  else if (pct >= 70) msg = 'Good effort!';
+  else if (pct >= 60) msg = 'Almost there!';
+  else msg = 'Keep studying! 📚';
   document.getElementById('score-msg').textContent = msg;
-  document.getElementById('score-sub').textContent = sub;
+
+  // Show/hide review missed button
+  const reviewBtn = document.getElementById('review-missed-btn');
+  if (missedQuestions.length === 0) {
+    reviewBtn.style.display = 'none';
+  } else {
+    reviewBtn.style.display = '';
+    reviewBtn.textContent = `Review ${missedQuestions.length} Missed`;
+  }
+}
+
+function showMissedReview() {
+  document.getElementById('results-summary').classList.add('hidden');
+  document.getElementById('missed-review').classList.remove('hidden');
+  document.getElementById('missed-count-badge').textContent = missedQuestions.length;
+
+  const list = document.getElementById('missed-list');
+  list.innerHTML = '';
+  missedQuestions.forEach((m, i) => {
+    const div = document.createElement('div');
+    div.className = 'missed-item';
+    div.style.animationDelay = `${i * 0.06}s`;
+    div.innerHTML = `
+      <div class="missed-q-label">Question ${i + 1} — Incorrect</div>
+      <div class="missed-q-text">${m.question}</div>
+      <div class="missed-answers">
+        <div class="missed-answer your-ans">
+          <span class="ans-icon">✗</span>
+          <div><span class="ans-label">Your answer</span>${m.yourAnswer}</div>
+        </div>
+        <div class="missed-answer right-ans">
+          <span class="ans-icon">✓</span>
+          <div><span class="ans-label">Correct answer</span>${m.correctAnswer}</div>
+        </div>
+      </div>`;
+    list.appendChild(div);
+  });
+}
+
+function showResultsSummary() {
+  document.getElementById('missed-review').classList.add('hidden');
+  document.getElementById('results-summary').classList.remove('hidden');
 }
 
 function restartQuiz() { initQuiz(); }
