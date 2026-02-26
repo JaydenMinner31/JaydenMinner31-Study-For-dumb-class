@@ -2,891 +2,1018 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>StudyFlow — Cold War Ch. 14</title>
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,300;0,500;1,300&family=DM+Sans:wght@300;400;500&family=Dancing+Script:wght@600&display=swap&font-display=swap" rel="stylesheet">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>StudyFlow</title>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,200;0,300;0,500;1,200;1,300&family=DM+Sans:wght@300;400;500&family=Dancing+Script:wght@600&display=swap" rel="stylesheet">
 <style>
-  /* ── RESET & BASE ─────────────────────────────────────────── */
-  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-  :root {
-    --bg: #0f0f11;
-    --surface: #18181c;
-    --surface2: #222228;
-    --border: rgba(255,255,255,0.07);
-    --text: #f0eee8;
-    --muted: #6b6975;
-    --accent: #c8f060;
-    --accent2: #f0a060;
-    --red: #f06070;
-    --radius: 16px;
-
-    /* Fluid spacing scale */
-    --space-xs: clamp(6px,  1.5vw, 10px);
-    --space-sm: clamp(10px, 2.5vw, 16px);
-    --space-md: clamp(16px, 4vw,   24px);
-    --space-lg: clamp(24px, 5vw,   40px);
-
-    /* Fluid font scale */
-    --text-xs:  clamp(0.65rem, 2vw, 0.72rem);
-    --text-sm:  clamp(0.78rem, 2.5vw, 0.88rem);
-    --text-base:clamp(0.88rem, 3vw,  1rem);
-    --text-lg:  clamp(1rem,    4vw,  1.3rem);
-    --text-xl:  clamp(1.1rem,  4.5vw,1.5rem);
-  }
-
-  html { height: 100%; }
-
-  body {
-    background: var(--bg);
-    color: var(--text);
-    font-family: 'DM Sans', system-ui, -apple-system, sans-serif;
-    font-size: var(--text-base);
-    line-height: 1.5;
-    min-height: 100%;
-    overflow-x: hidden;
-    -webkit-text-size-adjust: 100%;
-    text-size-adjust: 100%;
-  }
-
-  /* Background orbs — reduce on small screens */
-  body::before, body::after {
-    content: '';
-    position: fixed;
-    border-radius: 50%;
-    filter: blur(80px);
-    pointer-events: none;
-    z-index: 0;
-  }
-  body::before { width: min(500px, 80vw); height: min(500px, 80vw); background: rgba(200,240,96,0.04); top: -20%; right: -10%; }
-  body::after  { width: min(400px, 70vw); height: min(400px, 70vw); background: rgba(240,160,96,0.04); bottom: -20%; left: -10%; }
-
-  /* ── LAYOUT ────────────────────────────────────────────────── */
-  .app {
-    position: relative;
-    z-index: 1;
-    width: 100%;
-    max-width: 760px;
-    margin: 0 auto;
-    padding: var(--space-lg) var(--space-md);
-    min-height: 100dvh;
-    display: flex;
-    flex-direction: column;
-    gap: 0;
-  }
-
-  /* ── HEADER ────────────────────────────────────────────────── */
-  .header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-bottom: var(--space-lg);
-    animation: fadeUp 0.5s ease both;
-    flex-wrap: wrap;
-    gap: var(--space-sm);
-  }
-
-  .header-left { display: flex; flex-direction: column; gap: 3px; }
-
-  .logo {
-    font-family: 'Fraunces', Georgia, serif;
-    font-size: clamp(1.1rem, 5vw, 1.4rem);
-    font-weight: 300;
-    letter-spacing: -0.02em;
-    line-height: 1;
-  }
-  .logo span { color: var(--accent); font-style: italic; }
-
-  .chapter-tag {
-    font-size: var(--text-xs);
-    color: var(--muted);
-    letter-spacing: 0.07em;
-    text-transform: uppercase;
-  }
-
-  .mode-toggle {
-    display: flex;
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 50px;
-    padding: 3px;
-    gap: 2px;
-    flex-shrink: 0;
-  }
-
-  .mode-btn {
-    padding: clamp(6px,2vw,9px) clamp(14px,4vw,22px);
-    border-radius: 50px;
-    border: none;
-    background: transparent;
-    color: var(--muted);
-    font-family: inherit;
-    font-size: var(--text-sm);
-    font-weight: 500;
-    cursor: pointer;
-    transition: all 0.22s ease;
-    white-space: nowrap;
-  }
-  .mode-btn.active { background: var(--accent); color: #111; }
-
-  /* ── CONTENT AREA ──────────────────────────────────────────── */
-  .content {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: var(--space-md);
-    padding-bottom: var(--space-lg);
-  }
-
-  /* ── FILTER CHIPS ──────────────────────────────────────────── */
-  .filter-row {
-    display: flex;
-    gap: var(--space-xs);
-    flex-wrap: wrap;
-    justify-content: center;
-    animation: fadeUp 0.5s 0.1s ease both;
-    width: 100%;
-  }
-
-  .filter-chip {
-    padding: clamp(5px,1.5vw,7px) clamp(10px,3vw,15px);
-    border-radius: 50px;
-    border: 1px solid var(--border);
-    background: var(--surface);
-    color: var(--muted);
-    font-size: var(--text-xs);
-    cursor: pointer;
-    transition: all 0.2s ease;
-    white-space: nowrap;
-  }
-  .filter-chip.active { border-color: var(--accent); color: var(--accent); background: rgba(200,240,96,0.06); }
-
-  /* ── FLASHCARD ─────────────────────────────────────────────── */
-  .flashcard-wrap {
-    width: 100%;
-    perspective: 1000px;
-    animation: fadeUp 0.5s 0.05s ease both;
-  }
-
-  .flashcard-spacer {
-    width: 100%;
-    /* Fluid card height: taller on desktop, shorter on mobile */
-    height: clamp(220px, 45vw, 320px);
-    display: flex;
-    align-items: stretch;
-  }
-
-  .flashcard {
-    width: 100%;
-    position: relative;
-    cursor: pointer;
-    transform-style: preserve-3d;
-    transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
-  }
-  .flashcard.flipped { transform: rotateY(180deg); }
-
-  .card-face {
-    position: absolute;
-    inset: 0;
-    backface-visibility: hidden;
-    -webkit-backface-visibility: hidden;
-    border-radius: var(--radius);
-    border: 1px solid var(--border);
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    /* Enough padding to keep text away from edges and hint */
-    padding: var(--space-md) var(--space-md) clamp(44px, 10vw, 56px);
-    text-align: center;
-    overflow: hidden;
-  }
-
-  .card-front { background: var(--surface); }
-  .card-front::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(135deg, rgba(200,240,96,0.05) 0%, transparent 60%);
-    pointer-events: none;
-  }
-
-  .card-back { background: var(--surface2); transform: rotateY(180deg); }
-  .card-back::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(135deg, rgba(240,160,96,0.06) 0%, transparent 60%);
-    pointer-events: none;
-  }
-
-  .card-category {
-    position: absolute;
-    top: 12px;
-    right: 12px;
-    font-size: var(--text-xs);
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    padding: 3px 9px;
-    border-radius: 20px;
-    border: 1px solid var(--border);
-    color: var(--muted);
-    background: var(--surface2);
-    z-index: 2;
-  }
-
-  .card-label {
-    font-size: var(--text-xs);
-    font-weight: 500;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-    color: var(--muted);
-    margin-bottom: var(--space-sm);
-    position: relative;
-    z-index: 1;
-  }
-
-  .card-text {
-    font-family: 'Fraunces', Georgia, serif;
-    font-size: var(--text-lg);
-    font-weight: 300;
-    line-height: 1.5;
-    color: var(--text);
-    position: relative;
-    z-index: 1;
-    word-break: break-word;
-    overflow-wrap: anywhere;
-    /* Prevent overflow if card is very short */
-    max-height: calc(100% - 80px);
-    overflow-y: auto;
-  }
-
-  .card-hint {
-    position: absolute;
-    bottom: 12px;
-    left: 0; right: 0;
-    font-size: var(--text-xs);
-    color: var(--muted);
-    text-align: center;
-    padding: 0 var(--space-sm);
-    z-index: 1;
-  }
-
-  /* ── PROGRESS BAR ──────────────────────────────────────────── */
-  .progress-bar {
-    width: 100%;
-    height: 3px;
-    background: var(--surface2);
-    border-radius: 10px;
-    overflow: hidden;
-  }
-  .progress-fill {
-    height: 100%;
-    background: var(--accent);
-    border-radius: 10px;
-    transition: width 0.4s cubic-bezier(0.4,0,0.2,1);
-  }
-
-  .counter { font-size: var(--text-sm); color: var(--muted); text-align: center; }
-  .counter strong { color: var(--text); }
-
-  /* ── CARD NAV ──────────────────────────────────────────────── */
-  .card-nav { display: flex; gap: var(--space-sm); align-items: center; }
-
-  .nav-btn {
-    width: clamp(40px,10vw,52px);
-    height: clamp(40px,10vw,52px);
-    border-radius: 50%;
-    border: 1px solid var(--border);
-    background: var(--surface);
-    color: var(--text);
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: all 0.2s ease;
-    font-size: clamp(0.9rem, 3vw, 1.1rem);
-    flex-shrink: 0;
-  }
-  .nav-btn:hover:not(:disabled) { border-color: var(--accent); color: var(--accent); transform: scale(1.05); }
-  .nav-btn:disabled { opacity: 0.3; cursor: not-allowed; }
-
-  .pill-btn {
-    padding: 0 clamp(14px, 4vw, 22px);
-    height: clamp(40px, 10vw, 52px);
-    border-radius: 50px;
-    border: 1px solid var(--border);
-    background: var(--surface);
-    color: var(--muted);
-    font-family: inherit;
-    font-size: var(--text-sm);
-    cursor: pointer;
-    transition: all 0.2s ease;
-    white-space: nowrap;
-  }
-  .pill-btn:hover { border-color: var(--accent2); color: var(--accent2); }
-
-  /* ── QUIZ ──────────────────────────────────────────────────── */
-  #quiz-content { width: 100%; }
-
-  .stats-row {
-    display: flex;
-    gap: var(--space-xs);
-    flex-wrap: wrap;
-    animation: fadeUp 0.5s 0.15s ease both;
-  }
-
-  .stat-chip {
-    padding: clamp(5px,1.5vw,8px) clamp(10px,3vw,14px);
-    border-radius: 50px;
-    border: 1px solid var(--border);
-    background: var(--surface);
-    font-size: var(--text-xs);
-    color: var(--muted);
-    display: flex;
-    align-items: center;
-    gap: 6px;
-  }
-  .stat-chip .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent); flex-shrink: 0; }
-  .stat-chip .dot.red { background: var(--red); }
-
-  .question-card {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    padding: var(--space-md);
-    padding-top: calc(var(--space-md) + 2px);
-    margin-bottom: var(--space-sm);
-    position: relative;
-    overflow: hidden;
-  }
-  .question-card::before {
-    content: '';
-    position: absolute;
-    top: 0; left: 0; right: 0;
-    height: 2px;
-    background: linear-gradient(90deg, var(--accent), var(--accent2));
-  }
-
-  .question-num {
-    font-size: var(--text-xs);
-    font-weight: 500;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    color: var(--muted);
-    margin-bottom: var(--space-xs);
-  }
-
-  .question-text {
-    font-family: 'Fraunces', Georgia, serif;
-    font-size: var(--text-lg);
-    font-weight: 300;
-    line-height: 1.5;
-    word-break: break-word;
-    overflow-wrap: anywhere;
-  }
-
-  /* ── OPTIONS ───────────────────────────────────────────────── */
-  .options { display: flex; flex-direction: column; gap: var(--space-xs); }
-
-  .option-btn {
-    width: 100%;
-    padding: clamp(11px,3vw,15px) clamp(12px,3.5vw,18px);
-    border-radius: 12px;
-    border: 1px solid var(--border);
-    background: var(--surface);
-    color: var(--text);
-    font-family: inherit;
-    font-size: var(--text-sm);
-    text-align: left;
-    cursor: pointer;
-    transition: border-color 0.18s, background 0.18s, transform 0.18s;
-    display: flex;
-    align-items: flex-start;
-    gap: clamp(8px, 2.5vw, 13px);
-    line-height: 1.45;
-    word-break: break-word;
-    overflow-wrap: anywhere;
-  }
-
-  .option-letter {
-    width: clamp(22px, 6vw, 27px);
-    height: clamp(22px, 6vw, 27px);
-    min-width: clamp(22px, 6vw, 27px);
-    border-radius: 7px;
-    background: var(--surface2);
-    border: 1px solid var(--border);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: var(--text-xs);
-    font-weight: 600;
-    flex-shrink: 0;
-    transition: all 0.18s ease;
-    color: var(--muted);
-    margin-top: 1px;
-  }
-
-  .option-btn:hover:not(:disabled) {
-    border-color: rgba(200,240,96,0.35);
-    background: rgba(200,240,96,0.04);
-    transform: translateX(3px);
-  }
-  .option-btn:hover:not(:disabled) .option-letter { background: var(--accent); color: #111; border-color: var(--accent); }
-
-  .option-btn.correct { border-color: var(--accent); background: rgba(200,240,96,0.08); animation: pulse-correct 0.4s ease; }
-  .option-btn.correct .option-letter { background: var(--accent); color: #111; border-color: var(--accent); }
-  .option-btn.wrong { border-color: var(--red); background: rgba(240,96,112,0.08); animation: shake 0.35s ease; }
-  .option-btn.wrong .option-letter { background: var(--red); color: #fff; border-color: var(--red); }
-  .option-btn:disabled { cursor: default; }
-  .option-btn:disabled:not(.correct):not(.wrong) { opacity: 0.42; }
-  .option-btn:active:not(:disabled) { transform: scale(0.985); }
-
-  @keyframes btn-click-ripple {
-    0%   { transform: translateX(0) scale(1); }
-    18%  { transform: translateX(-5px) scale(0.985); }
-    40%  { transform: translateX(4px) scale(0.99); }
-    62%  { transform: translateX(-3px) scale(0.995); }
-    80%  { transform: translateX(2px) scale(1); }
-    100% { transform: translateX(0) scale(1); }
-  }
-  .option-btn.clicked { animation: btn-click-ripple 0.42s cubic-bezier(0.36, 0.07, 0.19, 0.97) both; }
-
-  /* ── FEEDBACK ──────────────────────────────────────────────── */
-  .feedback {
-    padding: clamp(10px,3vw,13px) clamp(12px,3.5vw,18px);
-    border-radius: 11px;
-    font-size: var(--text-sm);
-    font-weight: 500;
-    opacity: 0;
-    transform: translateY(6px);
-    transition: all 0.28s ease;
-    pointer-events: none;
-    margin-top: var(--space-xs);
-  }
-  .feedback.show { opacity: 1; transform: translateY(0); pointer-events: auto; }
-  .feedback.correct-fb { background: rgba(200,240,96,0.1); border: 1px solid rgba(200,240,96,0.2); color: var(--accent); }
-  .feedback.wrong-fb { background: rgba(240,96,112,0.1); border: 1px solid rgba(240,96,112,0.2); color: var(--red); }
-
-  /* ── QUIZ NAV ──────────────────────────────────────────────── */
-  .quiz-nav {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-top: var(--space-md);
-  }
-
-  .next-btn {
-    padding: clamp(10px,3vw,13px) clamp(20px,5vw,28px);
-    border-radius: 50px;
-    border: none;
-    background: var(--accent);
-    color: #111;
-    font-family: inherit;
-    font-size: var(--text-sm);
-    font-weight: 500;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    opacity: 0;
-    transform: translateY(6px);
-    pointer-events: none;
-    white-space: nowrap;
-  }
-  .next-btn.show { opacity: 1; transform: translateY(0); pointer-events: auto; }
-  .next-btn:hover { box-shadow: 0 6px 20px rgba(200,240,96,0.25); transform: translateY(-1px); }
-
-  /* ── SCORE SCREEN ──────────────────────────────────────────── */
-  .score-screen { text-align: center; animation: fadeUp 0.5s ease both; width: 100%; }
-
-  .score-top-row {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: clamp(16px, 5vw, 32px);
-    margin-bottom: var(--space-md);
-    flex-wrap: wrap;
-  }
-
-  .score-circle {
-    width: clamp(100px, 28vw, 130px);
-    height: clamp(100px, 28vw, 130px);
-    border-radius: 50%;
-    border: 3px solid var(--accent);
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    background: radial-gradient(circle, rgba(200,240,96,0.08), transparent);
-    animation: popIn 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) both;
-    flex-shrink: 0;
-  }
-
-  .score-num {
-    font-family: 'Fraunces', Georgia, serif;
-    font-size: clamp(1.8rem, 7vw, 2.5rem);
-    font-weight: 300;
-    color: var(--accent);
-    line-height: 1;
-  }
-  .score-total { font-size: var(--text-xs); color: var(--muted); margin-top: 3px; }
-
-  .grade-badge {
-    font-family: 'Fraunces', Georgia, serif;
-    font-size: clamp(3rem, 12vw, 5rem);
-    font-weight: 500;
-    line-height: 1;
-    animation: popIn 0.6s 0.12s cubic-bezier(0.34, 1.56, 0.64, 1) both;
-  }
-  .grade-badge.A { color: var(--accent); }
-  .grade-badge.B { color: #7dd87a; }
-  .grade-badge.C { color: var(--accent2); }
-  .grade-badge.D { color: #f0b060; }
-  .grade-badge.F { color: var(--red); }
-
-  .score-msg {
-    font-family: 'Fraunces', Georgia, serif;
-    font-size: var(--text-xl);
-    font-weight: 300;
-    margin-bottom: 4px;
-  }
-
-  .score-pct {
-    font-size: clamp(1.6rem, 6vw, 2.2rem);
-    font-weight: 500;
-    color: var(--accent);
-    margin-bottom: var(--space-md);
-    letter-spacing: -0.02em;
-  }
-
-  .grade-breakdown {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 14px;
-    padding: clamp(10px,3vw,16px) clamp(10px,4vw,24px);
-    margin: 0 auto var(--space-md);
-    width: fit-content;
-    max-width: 100%;
-    gap: 0;
-  }
-
-  .breakdown-item {
-    text-align: center;
-    padding: 0 clamp(10px, 3.5vw, 22px);
-    font-size: var(--text-sm);
-    color: var(--muted);
-  }
-  .breakdown-item span {
-    display: block;
-    font-size: clamp(1.1rem, 4.5vw, 1.6rem);
-    font-weight: 500;
-    font-family: 'Fraunces', Georgia, serif;
-    margin-bottom: 2px;
-  }
-  .correct-bd span { color: var(--accent); }
-  .wrong-bd span { color: var(--red); }
-  .total-bd span { color: var(--text); }
-  .breakdown-divider { width: 1px; height: 36px; background: var(--border); flex-shrink: 0; }
-
-  /* ── BUTTONS ───────────────────────────────────────────────── */
-  .score-actions {
-    display: flex;
-    gap: var(--space-xs);
-    justify-content: center;
-    flex-wrap: wrap;
-    margin-bottom: var(--space-sm);
-  }
-
-  .restart-btn {
-    padding: clamp(9px,2.5vw,12px) clamp(16px,4vw,24px);
-    border-radius: 50px;
-    border: 1px solid var(--border);
-    background: var(--surface);
-    color: var(--text);
-    font-family: inherit;
-    font-size: var(--text-sm);
-    cursor: pointer;
-    transition: all 0.2s ease;
-    white-space: nowrap;
-  }
-  .restart-btn:hover { border-color: var(--accent); color: var(--accent); }
-  .restart-btn.primary { background: var(--accent); color: #111; border-color: var(--accent); }
-  .restart-btn.primary:hover { box-shadow: 0 6px 20px rgba(200,240,96,0.2); color: #111; }
-  .restart-btn.accent2 { border-color: var(--accent2); color: var(--accent2); }
-  .restart-btn.accent2:hover { background: rgba(240,160,96,0.08); }
-
-  /* ── MISSED REVIEW ─────────────────────────────────────────── */
-  .review-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-bottom: var(--space-md);
-    flex-wrap: wrap;
-    gap: var(--space-sm);
-  }
-
-  .review-title {
-    font-family: 'Fraunces', Georgia, serif;
-    font-size: var(--text-xl);
-    font-weight: 300;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-  }
-
-  .missed-count-badge {
-    background: var(--red);
-    color: #fff;
-    font-family: inherit;
-    font-size: var(--text-xs);
-    font-weight: 600;
-    padding: 2px 9px;
-    border-radius: 50px;
-  }
-
-  .back-btn {
-    padding: clamp(6px,2vw,9px) clamp(12px,3.5vw,18px);
-    border-radius: 50px;
-    border: 1px solid var(--border);
-    background: var(--surface);
-    color: var(--muted);
-    font-family: inherit;
-    font-size: var(--text-sm);
-    cursor: pointer;
-    transition: all 0.2s ease;
-    white-space: nowrap;
-  }
-  .back-btn:hover { border-color: var(--accent); color: var(--accent); }
-
-  .missed-item {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 14px;
-    padding: var(--space-md);
-    padding-top: calc(var(--space-md) + 2px);
-    margin-bottom: var(--space-sm);
-    text-align: left;
-    position: relative;
-    overflow: hidden;
-    animation: fadeUp 0.35s ease both;
-  }
-  .missed-item::before {
-    content: '';
-    position: absolute;
-    top: 0; left: 0; right: 0;
-    height: 2px;
-    background: linear-gradient(90deg, var(--red), var(--accent2));
-  }
-
-  .missed-q-label {
-    font-size: var(--text-xs);
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    color: var(--red);
-    margin-bottom: var(--space-xs);
-    font-weight: 600;
-  }
-
-  .missed-q-text {
-    font-family: 'Fraunces', Georgia, serif;
-    font-size: var(--text-base);
-    font-weight: 300;
-    line-height: 1.5;
-    margin-bottom: var(--space-sm);
-    color: var(--text);
-    word-break: break-word;
-    overflow-wrap: anywhere;
-  }
-
-  .missed-answers { display: flex; flex-direction: column; gap: var(--space-xs); }
-
-  .missed-answer {
-    padding: clamp(9px,2.5vw,12px) clamp(12px,3vw,16px);
-    border-radius: 10px;
-    font-size: var(--text-sm);
-    display: flex;
-    align-items: flex-start;
-    gap: 10px;
-    word-break: break-word;
-    overflow-wrap: anywhere;
-    line-height: 1.45;
-  }
-  .missed-answer.your-ans { background: rgba(240,96,112,0.08); border: 1px solid rgba(240,96,112,0.2); color: var(--red); }
-  .missed-answer.right-ans { background: rgba(200,240,96,0.08); border: 1px solid rgba(200,240,96,0.2); color: var(--accent); }
-
-  .ans-icon { font-size: var(--text-sm); flex-shrink: 0; margin-top: 2px; }
-  .ans-label {
-    font-size: var(--text-xs);
-    font-weight: 600;
-    letter-spacing: 0.06em;
-    text-transform: uppercase;
-    opacity: 0.7;
-    display: block;
-    margin-bottom: 2px;
-  }
-
-  /* ── SIGNATURE ─────────────────────────────────────────────── */
-  .signature {
-    position: fixed;
-    bottom: clamp(12px, 3vw, 20px);
-    right: clamp(14px, 4vw, 28px);
-    font-family: 'Dancing Script', cursive;
-    font-size: clamp(1rem, 3.5vw, 1.3rem);
-    color: var(--accent);
-    opacity: 0.7;
-    pointer-events: none;
-    z-index: 100;
-    letter-spacing: 0.01em;
-  }
-
-  /* ── UTILITY ───────────────────────────────────────────────── */
-  .hidden { display: none !important; }
-
-  /* ── ANIMATIONS ────────────────────────────────────────────── */
-  @keyframes fadeUp    { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
-  @keyframes popIn     { from { opacity: 0; transform: scale(0.55); } to { opacity: 1; transform: scale(1); } }
-  @keyframes pulse-correct { 0%,100% { transform: scale(1); } 50% { transform: scale(1.012); } }
-  @keyframes shake     { 0%,100% { transform: translateX(0); } 20% { transform: translateX(-5px); } 60% { transform: translateX(5px); } }
-  @keyframes cardSlideIn { from { opacity: 0; transform: translateX(24px); } to { opacity: 1; transform: translateX(0); } }
-  .slide-in { animation: cardSlideIn 0.28s ease both; }
-
-  /* ── LARGE SCREEN ENHANCEMENTS ─────────────────────────────── */
-  @media (min-width: 700px) {
-    .flashcard-spacer { height: 300px; }
-    .card-hint { font-size: 0.73rem; }
-  }
-
-  /* ── TOUCH DEVICE: remove hover transforms that feel laggy ─── */
-  @media (hover: none) {
-    .option-btn:hover:not(:disabled) { transform: none; }
-    .nav-btn:hover:not(:disabled) { transform: none; }
-    .next-btn:hover { transform: none; box-shadow: none; }
-  }
-
-  /* ── LANDSCAPE PHONE ───────────────────────────────────────── */
-  @media (max-height: 500px) and (orientation: landscape) {
-    .header { margin-bottom: var(--space-sm); }
-    .flashcard-spacer { height: 180px; }
-    .content { gap: var(--space-sm); }
-    .card-face { padding: var(--space-sm) var(--space-sm) 40px; }
-  }
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg: #0c0c0e;
+  --surface: #16161a;
+  --surface2: #1e1e24;
+  --surface3: #252530;
+  --border: rgba(255,255,255,0.07);
+  --border2: rgba(255,255,255,0.12);
+  --text: #f0eee8;
+  --muted: #6b6975;
+  --muted2: #4a4855;
+  --accent: #c8f060;
+  --accent2: #f0a060;
+  --blue: #60b8f0;
+  --red: #f06070;
+  --radius: 18px;
+  --space-xs: clamp(6px,1.5vw,10px);
+  --space-sm: clamp(10px,2.5vw,16px);
+  --space-md: clamp(16px,4vw,24px);
+  --space-lg: clamp(24px,5vw,40px);
+  --text-xs: clamp(0.65rem,2vw,0.72rem);
+  --text-sm: clamp(0.78rem,2.5vw,0.88rem);
+  --text-base: clamp(0.88rem,3vw,1rem);
+  --text-lg: clamp(1rem,4vw,1.3rem);
+  --text-xl: clamp(1.1rem,4.5vw,1.5rem);
+}
+
+html, body { height: 100%; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'DM Sans', system-ui, -apple-system, sans-serif;
+  font-size: var(--text-base);
+  line-height: 1.5;
+  overflow-x: hidden;
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
+/* ── SHARED AMBIENT BG ── */
+.ambient {
+  position: fixed; inset: 0; pointer-events: none; z-index: 0; overflow: hidden;
+}
+.ambient-orb {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(100px);
+  opacity: 0.5;
+}
+.orb1 { width: min(600px,90vw); height: min(600px,90vw); background: rgba(200,240,96,0.06); top: -20%; right: -15%; }
+.orb2 { width: min(500px,80vw); height: min(500px,80vw); background: rgba(240,160,96,0.05); bottom: -20%; left: -15%; }
+.orb3 { width: min(400px,70vw); height: min(400px,70vw); background: rgba(96,184,240,0.04); top: 30%; left: 20%; }
+
+/* ── PAGE SYSTEM ── */
+.page { position: fixed; inset: 0; display: flex; flex-direction: column; overflow-y: auto; overflow-x: hidden; transition: opacity 0.4s ease, transform 0.4s ease; z-index: 1; }
+.page.hidden { opacity: 0; pointer-events: none; transform: translateY(20px); }
+.page.slide-out { transform: translateX(-40px); opacity: 0; }
+.page.slide-in-right { transform: translateX(40px); opacity: 0; }
+
+/* ═══════════════════════════════════════════════════════
+   INTRO PAGE
+═══════════════════════════════════════════════════════ */
+#intro-page {
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-lg) var(--space-md);
+  text-align: center;
+  gap: 0;
+}
+
+.intro-logo-wrap {
+  margin-bottom: clamp(32px,8vw,56px);
+  animation: fadeUp 0.7s ease both;
+}
+
+.intro-logo {
+  font-family: 'Fraunces', Georgia, serif;
+  font-size: clamp(3rem,12vw,6rem);
+  font-weight: 200;
+  letter-spacing: -0.04em;
+  line-height: 0.95;
+  color: var(--text);
+}
+.intro-logo em { color: var(--accent); font-style: italic; }
+
+.intro-tagline {
+  font-size: var(--text-base);
+  color: var(--muted);
+  margin-top: clamp(10px,3vw,16px);
+  letter-spacing: 0.02em;
+}
+
+.intro-divider {
+  width: clamp(40px,12vw,80px);
+  height: 1px;
+  background: var(--border2);
+  margin: clamp(28px,6vw,44px) auto;
+  animation: fadeUp 0.7s 0.1s ease both;
+}
+
+.intro-subjects-label {
+  font-size: var(--text-xs);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: clamp(18px,4vw,28px);
+  animation: fadeUp 0.7s 0.15s ease both;
+}
+
+.intro-subjects {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+  width: 100%;
+  max-width: 480px;
+  animation: fadeUp 0.7s 0.2s ease both;
+}
+
+.subject-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: clamp(18px,5vw,26px) clamp(20px,5vw,28px);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  text-align: left;
+  transition: all 0.25s cubic-bezier(0.4,0,0.2,1);
+  position: relative;
+  overflow: hidden;
+}
+.subject-card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  transition: opacity 0.25s;
+}
+.subject-card:hover { transform: translateY(-3px); border-color: var(--border2); box-shadow: 0 12px 40px rgba(0,0,0,0.3); }
+.subject-card:hover::before { opacity: 1; }
+.subject-card:active { transform: translateY(0) scale(0.99); }
+
+.subject-card.history::before { background: linear-gradient(135deg, rgba(200,240,96,0.04), transparent); }
+.subject-card.history:hover { border-color: rgba(200,240,96,0.25); }
+.subject-card.marketing::before { background: linear-gradient(135deg, rgba(240,160,96,0.05), transparent); }
+.subject-card.marketing:hover { border-color: rgba(240,160,96,0.25); }
+
+.subject-icon {
+  width: clamp(44px,12vw,56px);
+  height: clamp(44px,12vw,56px);
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: clamp(1.2rem,4vw,1.6rem);
+  flex-shrink: 0;
+  position: relative;
+  z-index: 1;
+}
+.subject-card.history .subject-icon { background: rgba(200,240,96,0.1); }
+.subject-card.marketing .subject-icon { background: rgba(240,160,96,0.1); }
+
+.subject-info { flex: 1; position: relative; z-index: 1; }
+.subject-title {
+  font-family: 'Fraunces', Georgia, serif;
+  font-size: var(--text-lg);
+  font-weight: 300;
+  line-height: 1.2;
+  margin-bottom: 4px;
+}
+.subject-meta { font-size: var(--text-xs); color: var(--muted); }
+.subject-pills { display: flex; gap: 6px; margin-top: 8px; flex-wrap: wrap; }
+.subject-pill {
+  padding: 2px 9px;
+  border-radius: 20px;
+  border: 1px solid var(--border);
+  font-size: var(--text-xs);
+  color: var(--muted);
+}
+.subject-card.history .subject-pill { border-color: rgba(200,240,96,0.2); color: rgba(200,240,96,0.7); }
+.subject-card.marketing .subject-pill { border-color: rgba(240,160,96,0.2); color: rgba(240,160,96,0.7); }
+
+.subject-arrow {
+  font-size: 1.1rem;
+  color: var(--muted2);
+  transition: transform 0.2s, color 0.2s;
+  position: relative; z-index: 1;
+}
+.subject-card:hover .subject-arrow { transform: translateX(4px); color: var(--muted); }
+
+.intro-sig {
+  font-family: 'Dancing Script', cursive;
+  font-size: clamp(1rem,3.5vw,1.3rem);
+  color: var(--accent);
+  opacity: 0.6;
+  margin-top: clamp(32px,7vw,52px);
+  animation: fadeUp 0.7s 0.35s ease both;
+}
+
+/* ═══════════════════════════════════════════════════════
+   SUBJECT SELECT PAGE
+═══════════════════════════════════════════════════════ */
+#subject-page {
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-lg) var(--space-md);
+  gap: var(--space-md);
+}
+
+/* ═══════════════════════════════════════════════════════
+   STUDY APP PAGE
+═══════════════════════════════════════════════════════ */
+#app-page {
+  padding: 0;
+}
+
+.app {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  max-width: 760px;
+  margin: 0 auto;
+  padding: var(--space-lg) var(--space-md);
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ── HEADER ── */
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--space-lg);
+  animation: fadeUp 0.5s ease both;
+  flex-wrap: wrap;
+  gap: var(--space-sm);
+}
+
+.header-left { display: flex; flex-direction: column; gap: 3px; cursor: pointer; }
+.header-left:hover .logo { opacity: 0.8; }
+
+.logo {
+  font-family: 'Fraunces', Georgia, serif;
+  font-size: clamp(1.1rem,5vw,1.4rem);
+  font-weight: 300;
+  letter-spacing: -0.02em;
+  line-height: 1;
+  transition: opacity 0.2s;
+}
+.logo span { color: var(--accent); font-style: italic; }
+
+.chapter-tag { font-size: var(--text-xs); color: var(--muted); letter-spacing: 0.07em; text-transform: uppercase; }
+
+.header-right { display: flex; align-items: center; gap: var(--space-sm); }
+
+.back-to-subjects {
+  padding: clamp(5px,1.5vw,7px) clamp(10px,3vw,14px);
+  border-radius: 50px;
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--muted);
+  font-family: inherit;
+  font-size: var(--text-xs);
+  cursor: pointer;
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+.back-to-subjects:hover { border-color: var(--border2); color: var(--text); }
+
+.mode-toggle {
+  display: flex;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 50px;
+  padding: 3px;
+  gap: 2px;
+  flex-shrink: 0;
+}
+
+.mode-btn {
+  padding: clamp(6px,2vw,9px) clamp(14px,4vw,22px);
+  border-radius: 50px;
+  border: none;
+  background: transparent;
+  color: var(--muted);
+  font-family: inherit;
+  font-size: var(--text-sm);
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.22s ease;
+  white-space: nowrap;
+}
+.mode-btn.active { background: var(--accent); color: #111; }
+
+/* ── CONTENT ── */
+.content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-md);
+  padding-bottom: var(--space-lg);
+}
+
+/* ── FILTER CHIPS ── */
+.filter-row {
+  display: flex;
+  gap: var(--space-xs);
+  flex-wrap: wrap;
+  justify-content: center;
+  animation: fadeUp 0.5s 0.1s ease both;
+  width: 100%;
+}
+
+.filter-chip {
+  padding: clamp(5px,1.5vw,7px) clamp(10px,3vw,15px);
+  border-radius: 50px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--muted);
+  font-size: var(--text-xs);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+.filter-chip.active { border-color: var(--accent); color: var(--accent); background: rgba(200,240,96,0.06); }
+
+/* ── FLASHCARD ── */
+.flashcard-wrap { width: 100%; perspective: 1000px; animation: fadeUp 0.5s 0.05s ease both; }
+.flashcard-spacer { width: 100%; height: clamp(220px,45vw,320px); display: flex; align-items: stretch; }
+.flashcard { width: 100%; position: relative; cursor: pointer; transform-style: preserve-3d; transition: transform 0.6s cubic-bezier(0.4,0,0.2,1); }
+.flashcard.flipped { transform: rotateY(180deg); }
+
+.card-face {
+  position: absolute; inset: 0;
+  backface-visibility: hidden; -webkit-backface-visibility: hidden;
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  padding: var(--space-md) var(--space-md) clamp(44px,10vw,56px);
+  text-align: center; overflow: hidden;
+}
+.card-front { background: var(--surface); }
+.card-front::before { content: ''; position: absolute; inset: 0; background: linear-gradient(135deg,rgba(200,240,96,0.05) 0%,transparent 60%); pointer-events: none; }
+.card-back { background: var(--surface2); transform: rotateY(180deg); }
+.card-back::before { content: ''; position: absolute; inset: 0; background: linear-gradient(135deg,rgba(240,160,96,0.06) 0%,transparent 60%); pointer-events: none; }
+
+.card-category { position: absolute; top: 12px; right: 12px; font-size: var(--text-xs); letter-spacing: 0.1em; text-transform: uppercase; padding: 3px 9px; border-radius: 20px; border: 1px solid var(--border); color: var(--muted); background: var(--surface2); z-index: 2; }
+.card-label { font-size: var(--text-xs); font-weight: 500; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); margin-bottom: var(--space-sm); position: relative; z-index: 1; }
+.card-text { font-family: 'Fraunces', Georgia, serif; font-size: var(--text-lg); font-weight: 300; line-height: 1.5; color: var(--text); position: relative; z-index: 1; word-break: break-word; overflow-wrap: anywhere; max-height: calc(100% - 80px); overflow-y: auto; }
+.card-hint { position: absolute; bottom: 12px; left: 0; right: 0; font-size: var(--text-xs); color: var(--muted); text-align: center; padding: 0 var(--space-sm); z-index: 1; }
+
+/* ── PROGRESS ── */
+.progress-bar { width: 100%; height: 3px; background: var(--surface2); border-radius: 10px; overflow: hidden; }
+.progress-fill { height: 100%; background: var(--accent); border-radius: 10px; transition: width 0.4s cubic-bezier(0.4,0,0.2,1); }
+.counter { font-size: var(--text-sm); color: var(--muted); text-align: center; }
+.counter strong { color: var(--text); }
+
+/* ── CARD NAV ── */
+.card-nav { display: flex; gap: var(--space-sm); align-items: center; }
+.nav-btn { width: clamp(40px,10vw,52px); height: clamp(40px,10vw,52px); border-radius: 50%; border: 1px solid var(--border); background: var(--surface); color: var(--text); cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s ease; font-size: clamp(0.9rem,3vw,1.1rem); flex-shrink: 0; }
+.nav-btn:hover:not(:disabled) { border-color: var(--accent); color: var(--accent); transform: scale(1.05); }
+.nav-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+.pill-btn { padding: 0 clamp(14px,4vw,22px); height: clamp(40px,10vw,52px); border-radius: 50px; border: 1px solid var(--border); background: var(--surface); color: var(--muted); font-family: inherit; font-size: var(--text-sm); cursor: pointer; transition: all 0.2s ease; white-space: nowrap; }
+.pill-btn:hover { border-color: var(--accent2); color: var(--accent2); }
+
+/* ── QUIZ ── */
+#quiz-content { width: 100%; }
+.stats-row { display: flex; gap: var(--space-xs); flex-wrap: wrap; animation: fadeUp 0.5s 0.15s ease both; }
+.stat-chip { padding: clamp(5px,1.5vw,8px) clamp(10px,3vw,14px); border-radius: 50px; border: 1px solid var(--border); background: var(--surface); font-size: var(--text-xs); color: var(--muted); display: flex; align-items: center; gap: 6px; }
+.stat-chip .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent); flex-shrink: 0; }
+.stat-chip .dot.red { background: var(--red); }
+
+.question-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: var(--space-md); padding-top: calc(var(--space-md) + 2px); margin-bottom: var(--space-sm); position: relative; overflow: hidden; }
+.question-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px; background: linear-gradient(90deg,var(--accent),var(--accent2)); }
+.question-num { font-size: var(--text-xs); font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); margin-bottom: var(--space-xs); }
+.question-text { font-family: 'Fraunces', Georgia, serif; font-size: var(--text-lg); font-weight: 300; line-height: 1.5; word-break: break-word; overflow-wrap: anywhere; }
+
+/* ── OPTIONS ── */
+.options { display: flex; flex-direction: column; gap: var(--space-xs); }
+.options { position: relative; }
+
+/* Each option wrapped so animation never touches button's own transform */
+.option-wrap {
+  position: relative;
+  transform-origin: center;
+  will-change: transform;
+}
+
+.option-btn {
+  width: 100%;
+  padding: clamp(11px,3vw,15px) clamp(12px,3.5vw,18px);
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text);
+  font-family: inherit;
+  font-size: var(--text-sm);
+  text-align: left;
+  cursor: pointer;
+  transition: border-color 0.22s ease, background 0.22s ease, box-shadow 0.25s ease, opacity 0.22s ease;
+  display: flex;
+  align-items: flex-start;
+  gap: clamp(8px,2.5vw,13px);
+  line-height: 1.45;
+  word-break: break-word;
+  overflow-wrap: anywhere;
+  position: relative;
+  overflow: hidden;
+}
+/* Hover slide uses margin trick so it never touches transform */
+.option-btn:hover:not(:disabled) {
+  border-color: rgba(200,240,96,0.35);
+  background: rgba(200,240,96,0.04);
+  padding-left: clamp(15px,4.5vw,22px);
+}
+.option-btn:hover:not(:disabled) .option-letter { background: var(--accent); color: #111; border-color: var(--accent); }
+.option-letter { width: clamp(22px,6vw,27px); height: clamp(22px,6vw,27px); min-width: clamp(22px,6vw,27px); border-radius: 7px; background: var(--surface2); border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; font-size: var(--text-xs); font-weight: 600; flex-shrink: 0; transition: all 0.22s ease; color: var(--muted); margin-top: 1px; }
+
+/* CORRECT — smooth green bloom */
+.option-wrap.correct-wrap {
+  animation: correct-bounce 0.55s cubic-bezier(0.34, 1.4, 0.64, 1) both;
+}
+.option-btn.correct {
+  border-color: var(--accent);
+  background: rgba(200,240,96,0.09);
+  box-shadow: 0 0 0 3px rgba(200,240,96,0.12), 0 4px 24px rgba(200,240,96,0.1);
+}
+.option-btn.correct .option-letter { background: var(--accent); color: #111; border-color: var(--accent); }
+/* Shimmer sweep on correct */
+.option-btn.correct::after {
+  content: '';
+  position: absolute;
+  top: 0; left: -100%; width: 60%; height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(200,240,96,0.12), transparent);
+  animation: shimmer 0.7s 0.1s ease forwards;
+}
+@keyframes shimmer { to { left: 150%; } }
+
+/* WRONG — smooth elastic bump left then settle */
+.option-wrap.wrong-wrap {
+  animation: wrong-nudge 0.6s cubic-bezier(0.34, 1.2, 0.64, 1) both;
+}
+.option-btn.wrong {
+  border-color: var(--red);
+  background: rgba(240,96,112,0.09);
+  box-shadow: 0 0 0 3px rgba(240,96,112,0.1);
+}
+.option-btn.wrong .option-letter { background: var(--red); color: #fff; border-color: var(--red); }
+
+@keyframes correct-bounce {
+  0%   { transform: scale(1); }
+  35%  { transform: scale(1.025) translateY(-2px); }
+  65%  { transform: scale(0.995) translateY(1px); }
+  100% { transform: scale(1) translateY(0); }
+}
+@keyframes wrong-nudge {
+  0%   { transform: translateX(0); }
+  20%  { transform: translateX(-10px); }
+  45%  { transform: translateX(7px); }
+  65%  { transform: translateX(-4px); }
+  80%  { transform: translateX(2px); }
+  100% { transform: translateX(0); }
+}
+
+/* Click press — uses wrapper */
+.option-wrap.press {
+  animation: btn-press 0.25s cubic-bezier(0.4,0,0.2,1) both;
+}
+@keyframes btn-press {
+  0%   { transform: scale(1); }
+  40%  { transform: scale(0.97); }
+  100% { transform: scale(1); }
+}
+
+.option-btn:disabled { cursor: default; }
+.option-btn:disabled:not(.correct):not(.wrong) { opacity: 0.38; }
+
+/* ── FEEDBACK ── */
+.feedback { padding: clamp(10px,3vw,13px) clamp(12px,3.5vw,18px); border-radius: 11px; font-size: var(--text-sm); font-weight: 500; opacity: 0; transform: translateY(6px); transition: all 0.28s ease; pointer-events: none; margin-top: var(--space-xs); }
+.feedback.show { opacity: 1; transform: translateY(0); pointer-events: auto; }
+.feedback.correct-fb { background: rgba(200,240,96,0.1); border: 1px solid rgba(200,240,96,0.2); color: var(--accent); }
+.feedback.wrong-fb { background: rgba(240,96,112,0.1); border: 1px solid rgba(240,96,112,0.2); color: var(--red); }
+
+/* ── QUIZ NAV ── */
+.quiz-nav { display: flex; justify-content: space-between; align-items: center; margin-top: var(--space-md); }
+.next-btn { padding: clamp(10px,3vw,13px) clamp(20px,5vw,28px); border-radius: 50px; border: none; background: var(--accent); color: #111; font-family: inherit; font-size: var(--text-sm); font-weight: 500; cursor: pointer; transition: all 0.2s ease; opacity: 0; transform: translateY(6px); pointer-events: none; white-space: nowrap; }
+.next-btn.show { opacity: 1; transform: translateY(0); pointer-events: auto; }
+.next-btn:hover { box-shadow: 0 6px 20px rgba(200,240,96,0.25); transform: translateY(-1px); }
+
+/* ── SCORE SCREEN ── */
+.score-screen { text-align: center; animation: fadeUp 0.5s ease both; width: 100%; }
+.score-top-row { display: flex; align-items: center; justify-content: center; gap: clamp(16px,5vw,32px); margin-bottom: var(--space-md); flex-wrap: wrap; }
+.score-circle { width: clamp(100px,28vw,130px); height: clamp(100px,28vw,130px); border-radius: 50%; border: 3px solid var(--accent); display: flex; flex-direction: column; align-items: center; justify-content: center; background: radial-gradient(circle,rgba(200,240,96,0.08),transparent); animation: popIn 0.5s cubic-bezier(0.34,1.56,0.64,1) both; flex-shrink: 0; }
+.score-num { font-family: 'Fraunces', Georgia, serif; font-size: clamp(1.8rem,7vw,2.5rem); font-weight: 300; color: var(--accent); line-height: 1; }
+.score-total { font-size: var(--text-xs); color: var(--muted); margin-top: 3px; }
+.grade-badge { font-family: 'Fraunces', Georgia, serif; font-size: clamp(3rem,12vw,5rem); font-weight: 500; line-height: 1; animation: popIn 0.6s 0.12s cubic-bezier(0.34,1.56,0.64,1) both; }
+.grade-badge.A { color: var(--accent); }
+.grade-badge.B { color: #7dd87a; }
+.grade-badge.C { color: var(--accent2); }
+.grade-badge.D { color: #f0b060; }
+.grade-badge.F { color: var(--red); }
+.score-msg { font-family: 'Fraunces', Georgia, serif; font-size: var(--text-xl); font-weight: 300; margin-bottom: 4px; }
+.score-pct { font-size: clamp(1.6rem,6vw,2.2rem); font-weight: 500; color: var(--accent); margin-bottom: var(--space-md); letter-spacing: -0.02em; }
+.grade-breakdown { display: flex; align-items: center; justify-content: center; background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: clamp(10px,3vw,16px) clamp(10px,4vw,24px); margin: 0 auto var(--space-md); width: fit-content; max-width: 100%; }
+.breakdown-item { text-align: center; padding: 0 clamp(10px,3.5vw,22px); font-size: var(--text-sm); color: var(--muted); }
+.breakdown-item span { display: block; font-size: clamp(1.1rem,4.5vw,1.6rem); font-weight: 500; font-family: 'Fraunces', Georgia, serif; margin-bottom: 2px; }
+.correct-bd span { color: var(--accent); }
+.wrong-bd span { color: var(--red); }
+.total-bd span { color: var(--text); }
+.breakdown-divider { width: 1px; height: 36px; background: var(--border); flex-shrink: 0; }
+.score-actions { display: flex; gap: var(--space-xs); justify-content: center; flex-wrap: wrap; margin-bottom: var(--space-sm); }
+.restart-btn { padding: clamp(9px,2.5vw,12px) clamp(16px,4vw,24px); border-radius: 50px; border: 1px solid var(--border); background: var(--surface); color: var(--text); font-family: inherit; font-size: var(--text-sm); cursor: pointer; transition: all 0.2s ease; white-space: nowrap; }
+.restart-btn:hover { border-color: var(--accent); color: var(--accent); }
+.restart-btn.primary { background: var(--accent); color: #111; border-color: var(--accent); }
+.restart-btn.primary:hover { box-shadow: 0 6px 20px rgba(200,240,96,0.2); color: #111; }
+.restart-btn.accent2 { border-color: var(--accent2); color: var(--accent2); }
+.restart-btn.accent2:hover { background: rgba(240,160,96,0.08); }
+
+/* ── MISSED REVIEW ── */
+.review-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: var(--space-md); flex-wrap: wrap; gap: var(--space-sm); }
+.review-title { font-family: 'Fraunces', Georgia, serif; font-size: var(--text-xl); font-weight: 300; display: flex; align-items: center; gap: 10px; }
+.missed-count-badge { background: var(--red); color: #fff; font-family: inherit; font-size: var(--text-xs); font-weight: 600; padding: 2px 9px; border-radius: 50px; }
+.back-btn { padding: clamp(6px,2vw,9px) clamp(12px,3.5vw,18px); border-radius: 50px; border: 1px solid var(--border); background: var(--surface); color: var(--muted); font-family: inherit; font-size: var(--text-sm); cursor: pointer; transition: all 0.2s ease; white-space: nowrap; }
+.back-btn:hover { border-color: var(--accent); color: var(--accent); }
+.missed-item { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: var(--space-md); padding-top: calc(var(--space-md) + 2px); margin-bottom: var(--space-sm); text-align: left; position: relative; overflow: hidden; animation: fadeUp 0.35s ease both; }
+.missed-item::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px; background: linear-gradient(90deg,var(--red),var(--accent2)); }
+.missed-q-label { font-size: var(--text-xs); letter-spacing: 0.1em; text-transform: uppercase; color: var(--red); margin-bottom: var(--space-xs); font-weight: 600; }
+.missed-q-text { font-family: 'Fraunces', Georgia, serif; font-size: var(--text-base); font-weight: 300; line-height: 1.5; margin-bottom: var(--space-sm); color: var(--text); word-break: break-word; overflow-wrap: anywhere; }
+.missed-answers { display: flex; flex-direction: column; gap: var(--space-xs); }
+.missed-answer { padding: clamp(9px,2.5vw,12px) clamp(12px,3vw,16px); border-radius: 10px; font-size: var(--text-sm); display: flex; align-items: flex-start; gap: 10px; word-break: break-word; overflow-wrap: anywhere; line-height: 1.45; }
+.missed-answer.your-ans { background: rgba(240,96,112,0.08); border: 1px solid rgba(240,96,112,0.2); color: var(--red); }
+.missed-answer.right-ans { background: rgba(200,240,96,0.08); border: 1px solid rgba(200,240,96,0.2); color: var(--accent); }
+.ans-icon { font-size: var(--text-sm); flex-shrink: 0; margin-top: 2px; }
+.ans-label { font-size: var(--text-xs); font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; opacity: 0.7; display: block; margin-bottom: 2px; }
+
+/* ── SIGNATURE ── */
+.signature { position: fixed; bottom: clamp(12px,3vw,20px); right: clamp(14px,4vw,28px); font-family: 'Dancing Script', cursive; font-size: clamp(1rem,3.5vw,1.3rem); color: var(--accent); opacity: 0.65; pointer-events: none; z-index: 100; }
+.splash-sig { font-family: 'Dancing Script', cursive; font-size: clamp(1rem,3.5vw,1.2rem); color: var(--accent); opacity: 0.55; margin-top: 4px; pointer-events: none; }
+
+
+/* ═══════════════════════════════════════════════════════
+   SPLASH SCREEN
+═══════════════════════════════════════════════════════ */
+#splash-screen {
+  position: fixed;
+  inset: 0;
+  z-index: 999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg);
+  overflow: hidden;
+  transition: opacity 0.8s cubic-bezier(0.4,0,0.2,1), transform 0.8s cubic-bezier(0.4,0,0.2,1);
+}
+#splash-screen.dismissing {
+  opacity: 0;
+  transform: scale(1.06);
+  pointer-events: none;
+}
+#splash-screen.gone { display: none; }
+
+/* Blurred background */
+.splash-bg {
+  position: absolute;
+  inset: 0;
+  filter: blur(60px);
+  overflow: hidden;
+}
+.splash-orb {
+  position: absolute;
+  border-radius: 50%;
+}
+.s-orb1 { width: 70vmax; height: 70vmax; background: radial-gradient(circle, rgba(200,240,96,0.18), transparent 70%); top: -30%; right: -20%; animation: splash-drift1 8s ease-in-out infinite; }
+.s-orb2 { width: 60vmax; height: 60vmax; background: radial-gradient(circle, rgba(240,160,96,0.14), transparent 70%); bottom: -25%; left: -15%; animation: splash-drift2 10s ease-in-out infinite; }
+.s-orb3 { width: 40vmax; height: 40vmax; background: radial-gradient(circle, rgba(96,184,240,0.10), transparent 70%); top: 20%; left: 10%; animation: splash-drift3 12s ease-in-out infinite; }
+.s-orb4 { width: 30vmax; height: 30vmax; background: radial-gradient(circle, rgba(200,96,240,0.08), transparent 70%); bottom: 10%; right: 10%; animation: splash-drift1 9s 2s ease-in-out infinite; }
+
+@keyframes splash-drift1 { 0%,100% { transform: translate(0,0) scale(1); } 50% { transform: translate(3%,4%) scale(1.05); } }
+@keyframes splash-drift2 { 0%,100% { transform: translate(0,0) scale(1); } 50% { transform: translate(-3%,-3%) scale(1.08); } }
+@keyframes splash-drift3 { 0%,100% { transform: translate(0,0) scale(1); } 50% { transform: translate(4%,-4%) scale(0.95); } }
+
+/* Grid overlay */
+.splash-grid {
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(255,255,255,0.025) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,0.025) 1px, transparent 1px);
+  background-size: clamp(30px,6vw,60px) clamp(30px,6vw,60px);
+  mask-image: radial-gradient(ellipse 70% 70% at 50% 50%, transparent 40%, black 100%);
+  -webkit-mask-image: radial-gradient(ellipse 70% 70% at 50% 50%, transparent 40%, black 100%);
+}
+
+/* Circle wrap */
+.splash-circle-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: min(88vw, 88vh, 500px);
+  height: min(88vw, 88vh, 500px);
+}
+
+/* Pulsing rings */
+.splash-ring {
+  position: absolute;
+  border-radius: 50%;
+  border: 1px solid rgba(200,240,96,0.12);
+  animation: ring-pulse 3s ease-in-out infinite;
+}
+.splash-ring-1 { inset: -10%; animation-delay: 0s; }
+.splash-ring-2 { inset: -22%; border-color: rgba(200,240,96,0.07); animation-delay: 0.6s; }
+.splash-ring-3 { inset: -38%; border-color: rgba(200,240,96,0.04); animation-delay: 1.2s; }
+@keyframes ring-pulse { 0%,100% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.03); opacity: 0.6; } }
+
+/* Main circle */
+.splash-circle {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  border: 1px solid rgba(255,255,255,0.08);
+  background: radial-gradient(circle at 35% 35%,
+    rgba(200,240,96,0.06) 0%,
+    rgba(22,22,26,0.95) 50%,
+    rgba(12,12,14,0.98) 100%
+  );
+  backdrop-filter: blur(40px);
+  -webkit-backdrop-filter: blur(40px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow:
+    0 0 0 1px rgba(200,240,96,0.08),
+    0 0 80px rgba(200,240,96,0.06),
+    0 40px 120px rgba(0,0,0,0.6),
+    inset 0 1px 0 rgba(255,255,255,0.06);
+  animation: circle-appear 1s cubic-bezier(0.34,1.1,0.64,1) both;
+}
+@keyframes circle-appear {
+  from { opacity: 0; transform: scale(0.7); }
+  to   { opacity: 1; transform: scale(1); }
+}
+
+/* Inner content */
+.splash-inner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: clamp(8px,2vw,14px);
+  padding: clamp(24px,6vw,48px);
+  animation: fadeUp 0.8s 0.4s ease both;
+}
+
+.splash-logo {
+  font-family: 'Fraunces', Georgia, serif;
+  font-size: clamp(2rem,8vw,3.5rem);
+  font-weight: 200;
+  letter-spacing: -0.04em;
+  line-height: 1;
+  color: var(--text);
+}
+.splash-logo em { color: var(--accent); font-style: italic; }
+
+.splash-tagline {
+  font-size: clamp(0.65rem,2vw,0.78rem);
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-top: 4px;
+}
+
+.splash-sub {
+  font-size: clamp(0.8rem,2.5vw,0.95rem);
+  color: var(--muted);
+  line-height: 1.5;
+  max-width: 220px;
+}
+
+/* CTA button */
+.splash-btn {
+  margin-top: clamp(16px,4vw,28px);
+  padding: clamp(12px,3vw,16px) clamp(28px,6vw,44px);
+  border-radius: 50px;
+  border: 1px solid rgba(200,240,96,0.4);
+  background: rgba(200,240,96,0.08);
+  color: var(--accent);
+  font-family: inherit;
+  font-size: clamp(0.82rem,2.5vw,0.95rem);
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  transition: all 0.3s cubic-bezier(0.4,0,0.2,1);
+  position: relative;
+  overflow: hidden;
+}
+.splash-btn::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(200,240,96,0.12), transparent);
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+.splash-btn:hover { border-color: var(--accent); background: rgba(200,240,96,0.14); transform: translateY(-2px); box-shadow: 0 8px 32px rgba(200,240,96,0.2); }
+.splash-btn:hover::before { opacity: 1; }
+.splash-btn:hover .splash-btn-icon { transform: translateX(4px); }
+.splash-btn:active { transform: translateY(0) scale(0.97); }
+.splash-btn-icon { transition: transform 0.25s ease; display: inline-block; }
+
+/* Orbiting dots */
+.orbit-dot {
+  position: absolute;
+  width: clamp(6px,1.5vw,9px);
+  height: clamp(6px,1.5vw,9px);
+  border-radius: 50%;
+  background: var(--accent);
+  box-shadow: 0 0 12px var(--accent);
+}
+.od1 { animation: orbit1 6s linear infinite; }
+.od2 { animation: orbit1 9s 2s linear infinite reverse; background: var(--accent2); box-shadow: 0 0 12px var(--accent2); }
+.od3 { animation: orbit1 14s 4s linear infinite; background: var(--blue); box-shadow: 0 0 12px var(--blue); opacity: 0.7; }
+
+@keyframes orbit1 {
+  0%   { transform: rotate(0deg) translateX(calc(min(44vw, 44vh, 252px))) rotate(0deg); }
+  100% { transform: rotate(360deg) translateX(calc(min(44vw, 44vh, 252px))) rotate(-360deg); }
+}
+
+/* Corner decorations */
+.splash-corner {
+  position: absolute;
+  width: clamp(30px,6vw,50px);
+  height: clamp(30px,6vw,50px);
+  opacity: 0.3;
+}
+.splash-corner.tl { top: clamp(16px,4vw,32px); left: clamp(16px,4vw,32px); border-top: 1px solid var(--accent); border-left: 1px solid var(--accent); border-radius: 2px 0 0 0; }
+.splash-corner.tr { top: clamp(16px,4vw,32px); right: clamp(16px,4vw,32px); border-top: 1px solid var(--accent); border-right: 1px solid var(--accent); border-radius: 0 2px 0 0; }
+.splash-corner.bl { bottom: clamp(16px,4vw,32px); left: clamp(16px,4vw,32px); border-bottom: 1px solid var(--accent); border-left: 1px solid var(--accent); border-radius: 0 0 0 2px; }
+.splash-corner.br { bottom: clamp(16px,4vw,32px); right: clamp(16px,4vw,32px); border-bottom: 1px solid var(--accent); border-right: 1px solid var(--accent); border-radius: 0 0 2px 0; }
+
+
+/* ── UTILS ── */
+.hidden { display: none !important; }
+
+/* ── ANIMATIONS ── */
+@keyframes fadeUp { from { opacity: 0; transform: translateY(18px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes popIn { from { opacity: 0; transform: scale(0.55); } to { opacity: 1; transform: scale(1); } }
+/* correct/wrong keyframes now on .option-wrap — see above */
+@keyframes cardSlideIn { from { opacity: 0; transform: translateX(24px); } to { opacity: 1; transform: translateX(0); } }
+@keyframes float { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
+.slide-in { animation: cardSlideIn 0.28s ease both; }
+
+/* ── RESPONSIVE ── */
+@media (min-width: 700px) {
+  .flashcard-spacer { height: 300px; }
+}
+@media (hover: none) {
+  .option-btn:hover:not(:disabled) { transform: none; }
+  .nav-btn:hover:not(:disabled) { transform: none; }
+  .next-btn:hover { transform: none; box-shadow: none; }
+}
+@media (max-height: 500px) and (orientation: landscape) {
+  .header { margin-bottom: var(--space-sm); }
+  .flashcard-spacer { height: 160px; }
+  .content { gap: var(--space-sm); }
+  .card-face { padding: var(--space-sm) var(--space-sm) 36px; }
+  #intro-page { justify-content: flex-start; padding-top: var(--space-md); }
+}
 </style>
 </head>
 <body>
-<div class="app">
-  <header class="header">
-    <div class="header-left">
-      <div class="logo">Study<span>Flow</span></div>
-      <div class="chapter-tag">US History · Chapter 14 · Cold War Review</div>
-    </div>
-    <div class="mode-toggle">
-      <button class="mode-btn active" onclick="setMode('flashcard')">Flashcards</button>
-      <button class="mode-btn" onclick="setMode('quiz')">Quiz</button>
-    </div>
-  </header>
 
-  <!-- FLASHCARD MODE -->
-  <div id="flashcard-mode" class="content">
-    <div class="filter-row" id="filter-row">
-      <div class="filter-chip active" onclick="setFilter('all',this)">All Cards</div>
-      <div class="filter-chip" onclick="setFilter('concept',this)">Concepts</div>
-      <div class="filter-chip" onclick="setFilter('vocab',this)">Vocabulary</div>
-      <div class="filter-chip" onclick="setFilter('people',this)">People</div>
-      <div class="filter-chip" onclick="setFilter('event',this)">Events</div>
-    </div>
-    <div class="flashcard-wrap">
-      <div class="flashcard-spacer">
-        <div class="flashcard" id="flashcard" onclick="flipCard()">
-          <div class="card-face card-front">
-            <div class="card-category" id="fc-category">Concept</div>
-            <div class="card-label">Question</div>
-            <div class="card-text" id="fc-question">Click to begin</div>
-            <div class="card-hint">Click to reveal · ← → to navigate · Space to flip</div>
-          </div>
-          <div class="card-face card-back">
-            <div class="card-label">Answer</div>
-            <div class="card-text" id="fc-answer">Answer</div>
-            <div class="card-hint">Click to flip back</div>
-          </div>
-        </div>
+<!-- ═══ SPLASH SCREEN ═══ -->
+<div id="splash-screen">
+  <!-- Blurred background orbs visible through blur -->
+  <div class="splash-bg">
+    <div class="splash-orb s-orb1"></div>
+    <div class="splash-orb s-orb2"></div>
+    <div class="splash-orb s-orb3"></div>
+    <div class="splash-orb s-orb4"></div>
+  </div>
+  <!-- Grid overlay -->
+  <div class="splash-grid"></div>
+  <!-- Center circle -->
+  <div class="splash-circle-wrap">
+    <div class="splash-ring splash-ring-3"></div>
+    <div class="splash-ring splash-ring-2"></div>
+    <div class="splash-ring splash-ring-1"></div>
+    <div class="splash-circle">
+      <div class="splash-inner">
+        <div class="splash-logo">Study<em>Flow</em></div>
+        <div class="splash-tagline">Welcome to StudyFlow</div>
+        <div class="splash-sub">Your personal study companion</div>
+        <button class="splash-btn" onclick="dismissSplash()">
+          <span class="splash-btn-text">Begin Studying</span>
+          <span class="splash-btn-icon">→</span>
+        </button>
+        <div class="splash-sig">Jayden Minner</div>
       </div>
     </div>
-    <div class="progress-bar"><div class="progress-fill" id="fc-progress" style="width:0%"></div></div>
-    <div class="counter">Card <strong id="fc-current">1</strong> of <strong id="fc-total">0</strong></div>
-    <div class="card-nav">
-      <button class="nav-btn" id="fc-prev" onclick="prevCard()">←</button>
-      <button class="pill-btn" onclick="shuffleCards()">⇌ Shuffle</button>
-      <button class="nav-btn" id="fc-next" onclick="nextCard()">→</button>
+    <!-- Orbiting dots -->
+    <div class="orbit-dot od1"></div>
+    <div class="orbit-dot od2"></div>
+    <div class="orbit-dot od3"></div>
+  </div>
+  <!-- Corner decorations -->
+  <div class="splash-corner tl"></div>
+  <div class="splash-corner tr"></div>
+  <div class="splash-corner bl"></div>
+  <div class="splash-corner br"></div>
+</div>
+
+<!-- Ambient background -->
+<div class="ambient">
+  <div class="ambient-orb orb1"></div>
+  <div class="ambient-orb orb2"></div>
+  <div class="ambient-orb orb3"></div>
+</div>
+
+<!-- ═══ INTRO PAGE ═══ -->
+<div class="page" id="intro-page">
+  <div class="intro-logo-wrap">
+    <div class="intro-logo">Study<em>Flow</em></div>
+    <div class="intro-tagline">Your personal study companion</div>
+  </div>
+
+  <div class="intro-divider"></div>
+
+  <div class="intro-subjects-label">Choose a subject to study</div>
+
+  <div class="intro-subjects">
+    <div class="subject-card history" onclick="goToApp('history')">
+      <div class="subject-icon">🏛️</div>
+      <div class="subject-info">
+        <div class="subject-title">US History</div>
+        <div class="subject-meta">Chapter 14 · Cold War Review</div>
+        <div class="subject-pills">
+          <span class="subject-pill">42 flashcards</span>
+          <span class="subject-pill">42 quiz questions</span>
+        </div>
+      </div>
+      <div class="subject-arrow">›</div>
+    </div>
+
+    <div class="subject-card marketing" onclick="goToApp('marketing')">
+      <div class="subject-icon">📊</div>
+      <div class="subject-info">
+        <div class="subject-title">Sports & Entertainment Marketing</div>
+        <div class="subject-meta">Chapter 2 · Marketing Concepts</div>
+        <div class="subject-pills">
+          <span class="subject-pill">20 flashcards</span>
+          <span class="subject-pill">20 quiz questions</span>
+        </div>
+      </div>
+      <div class="subject-arrow">›</div>
     </div>
   </div>
 
-  <!-- QUIZ MODE -->
-  <div id="quiz-mode" class="content hidden">
-    <div id="quiz-content" style="width:100%;max-width:680px;">
-      <div id="score-screen" class="score-screen hidden">
-        <div id="results-summary">
-          <div class="score-top-row">
-            <div class="score-circle">
-              <div class="score-num" id="score-num">0</div>
-              <div class="score-total" id="score-total">of 0</div>
-            </div>
-            <div class="grade-badge" id="grade-badge">A</div>
-          </div>
-          <div class="score-msg" id="score-msg">Good effort!</div>
-          <div class="score-pct" id="score-pct">0%</div>
-          <div class="grade-breakdown" id="grade-breakdown">
-            <div class="breakdown-item correct-bd"><span id="bd-correct">0</span> correct</div>
-            <div class="breakdown-divider"></div>
-            <div class="breakdown-item wrong-bd"><span id="bd-wrong">0</span> missed</div>
-            <div class="breakdown-divider"></div>
-            <div class="breakdown-item total-bd"><span id="bd-total">0</span> total</div>
-          </div>
-          <div class="score-actions">
-            <button class="restart-btn primary" onclick="restartQuiz()">Try Again</button>
-            <button class="restart-btn accent2" id="review-missed-btn" onclick="showMissedReview()">Review Missed</button>
-            <button class="restart-btn" onclick="setMode('flashcard')">Flashcards</button>
-          </div>
+</div>
+
+<!-- ═══ APP PAGE ═══ -->
+<div class="page hidden" id="app-page">
+  <div class="app">
+    <header class="header">
+      <div class="header-left" onclick="goHome()">
+        <div class="logo">Study<span>Flow</span></div>
+        <div class="chapter-tag" id="chapter-tag">Loading...</div>
+      </div>
+      <div class="header-right">
+        <button class="back-to-subjects" onclick="goHome()">← Subjects</button>
+        <div class="mode-toggle">
+          <button class="mode-btn active" onclick="setMode('flashcard')">Flashcards</button>
+          <button class="mode-btn" onclick="setMode('quiz')">Quiz</button>
         </div>
-        <div id="missed-review" class="hidden">
-          <div class="review-header">
-            <button class="back-btn" onclick="showResultsSummary()">← Back to Results</button>
-            <div class="review-title">Missed Questions <span class="missed-count-badge" id="missed-count-badge">0</span></div>
-          </div>
-          <div id="missed-list"></div>
-          <div style="text-align:center;margin-top:28px;">
-            <button class="restart-btn primary" onclick="restartQuiz()">Retake Quiz</button>
+      </div>
+    </header>
+
+    <!-- FLASHCARD MODE -->
+    <div id="flashcard-mode" class="content">
+      <div class="filter-row" id="filter-row"></div>
+      <div class="flashcard-wrap">
+        <div class="flashcard-spacer">
+          <div class="flashcard" id="flashcard" onclick="flipCard()">
+            <div class="card-face card-front">
+              <div class="card-category" id="fc-category">Concept</div>
+              <div class="card-label">Question</div>
+              <div class="card-text" id="fc-question">Click to begin</div>
+              <div class="card-hint">Tap to reveal · ← → to navigate · Space to flip</div>
+            </div>
+            <div class="card-face card-back">
+              <div class="card-label">Answer</div>
+              <div class="card-text" id="fc-answer">Answer</div>
+              <div class="card-hint">Tap to flip back</div>
+            </div>
           </div>
         </div>
       </div>
-      <div id="question-ui">
-        <div class="stats-row">
-          <div class="stat-chip"><span class="dot"></span><span id="q-correct-count">0 correct</span></div>
-          <div class="stat-chip"><span class="dot red"></span><span id="q-wrong-count">0 wrong</span></div>
+      <div class="progress-bar"><div class="progress-fill" id="fc-progress" style="width:0%"></div></div>
+      <div class="counter">Card <strong id="fc-current">1</strong> of <strong id="fc-total">0</strong></div>
+      <div class="card-nav">
+        <button class="nav-btn" id="fc-prev" onclick="prevCard()">←</button>
+        <button class="pill-btn" onclick="shuffleCards()">⇌ Shuffle</button>
+        <button class="nav-btn" id="fc-next" onclick="nextCard()">→</button>
+      </div>
+    </div>
+
+    <!-- QUIZ MODE -->
+    <div id="quiz-mode" class="content hidden">
+      <div id="quiz-content" style="width:100%;">
+        <div id="score-screen" class="score-screen hidden">
+          <div id="results-summary">
+            <div class="score-top-row">
+              <div class="score-circle">
+                <div class="score-num" id="score-num">0</div>
+                <div class="score-total" id="score-total">of 0</div>
+              </div>
+              <div class="grade-badge" id="grade-badge">A</div>
+            </div>
+            <div class="score-msg" id="score-msg">Good effort!</div>
+            <div class="score-pct" id="score-pct">0%</div>
+            <div class="grade-breakdown">
+              <div class="breakdown-item correct-bd"><span id="bd-correct">0</span>correct</div>
+              <div class="breakdown-divider"></div>
+              <div class="breakdown-item wrong-bd"><span id="bd-wrong">0</span>missed</div>
+              <div class="breakdown-divider"></div>
+              <div class="breakdown-item total-bd"><span id="bd-total">0</span>total</div>
+            </div>
+            <div class="score-actions">
+              <button class="restart-btn primary" onclick="restartQuiz()">Try Again</button>
+              <button class="restart-btn accent2" id="review-missed-btn" onclick="showMissedReview()">Review Missed</button>
+              <button class="restart-btn" onclick="setMode('flashcard')">Flashcards</button>
+            </div>
+          </div>
+          <div id="missed-review" class="hidden">
+            <div class="review-header">
+              <button class="back-btn" onclick="showResultsSummary()">← Back</button>
+              <div class="review-title">Missed <span class="missed-count-badge" id="missed-count-badge">0</span></div>
+            </div>
+            <div id="missed-list"></div>
+            <div style="text-align:center;margin-top:24px;">
+              <button class="restart-btn primary" onclick="restartQuiz()">Retake Quiz</button>
+            </div>
+          </div>
         </div>
-        <div class="progress-bar" style="margin-bottom:16px;"><div class="progress-fill" id="quiz-progress" style="width:0%"></div></div>
-        <div class="question-card slide-in" id="question-card">
-          <div class="question-num" id="q-num">Question 1</div>
-          <div class="question-text" id="q-text">Loading…</div>
-        </div>
-        <div class="options" id="options-container"></div>
-        <div class="feedback" id="feedback"></div>
-        <div class="quiz-nav">
-          <div class="counter"><strong id="q-idx">1</strong> / <strong id="q-total">0</strong></div>
-          <button class="next-btn" id="next-btn" onclick="nextQuestion()">Next →</button>
+
+        <div id="question-ui">
+          <div class="stats-row">
+            <div class="stat-chip"><span class="dot"></span><span id="q-correct-count">0 correct</span></div>
+            <div class="stat-chip"><span class="dot red"></span><span id="q-wrong-count">0 wrong</span></div>
+          </div>
+          <div class="progress-bar" style="margin-bottom:var(--space-sm)"><div class="progress-fill" id="quiz-progress" style="width:0%"></div></div>
+          <div class="question-card slide-in" id="question-card">
+            <div class="question-num" id="q-num">Question 1</div>
+            <div class="question-text" id="q-text">Loading…</div>
+          </div>
+          <div class="options" id="options-container"></div>
+          <div class="feedback" id="feedback"></div>
+          <div class="quiz-nav">
+            <div class="counter"><strong id="q-idx">1</strong> / <strong id="q-total">0</strong></div>
+            <button class="next-btn" id="next-btn" onclick="nextQuestion()">Next →</button>
+          </div>
         </div>
       </div>
     </div>
   </div>
 </div>
 
-<div class="signature">Jayden Minner</div>
 
 <script>
-const allFlashcards = [
+
+// ── SPLASH ────────────────────────────────────────────────────
+function dismissSplash() {
+  const splash = document.getElementById('splash-screen');
+  splash.classList.add('dismissing');
+  setTimeout(() => splash.classList.add('gone'), 850);
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  SUBJECT DATA
+// ═══════════════════════════════════════════════════════════════
+
+const SUBJECTS = {
+  history: {
+    label: 'US History · Chapter 14 · Cold War Review',
+    categories: ['concept','vocab','people','event'],
+    flashcards: null, // assigned below
+    quiz: null,
+  },
+  marketing: {
+    label: 'Sports & Entertainment Marketing · Chapter 2 · Marketing Concepts',
+    categories: ['concept','vocab','scenario'],
+    flashcards: null,
+    quiz: null,
+  }
+};
+
+// ── COLD WAR DATA ──────────────────────────────────────────────
+const coldWarFlashcards = [
   {category:'concept', question:"How did the United Nations embody the ideals set forth in the Atlantic Charter?", answer:"The UN promoted international peace, cooperation, and self-determination — core ideals of the Atlantic Charter signed by FDR and Churchill in 1941."},
   {category:'concept', question:"Why did so many Republicans support the claims of Joseph McCarthy?", answer:"Republicans used McCarthy's anti-communist claims as a political weapon against Democrats, and many Americans feared communist infiltration during the Red Scare."},
   {category:'concept', question:"What prompted the Soviet Union to create the Warsaw Pact?", answer:"The Soviets formed the Warsaw Pact in 1955 in response to West Germany joining NATO — creating a rival military alliance among Eastern Bloc nations."},
@@ -932,7 +1059,7 @@ const allFlashcards = [
   {category:'vocab', question:"Define: Domino Theory", answer:"The belief that if one country fell to communism, neighbors would follow like falling dominoes — used to justify U.S. involvement in Korea and later Vietnam."},
 ];
 
-const allQuizQuestions = [
+const coldWarQuiz = [
   // ── CONCEPTS ──
   {question:"How did the United Nations reflect the ideals of the Atlantic Charter?", options:["It formed a military alliance against the USSR","It promoted peace, cooperation, and self-determination","It gave the U.S. permanent control over all votes","It replaced national governments with one world body"], correct:1},
   {question:"Why did many Republicans back McCarthy's anti-communist crusade?", options:["They verified his evidence before supporting him","They feared losing elections if they opposed him","They used it as a political weapon against Democrats","Congress required them to support his investigations"], correct:2},
@@ -982,12 +1109,128 @@ const allQuizQuestions = [
   {question:"The Domino Theory held that:", options:["Nuclear war would destroy all nations simultaneously and equally","Each economic depression in one country would trigger collapse in others","If one nation fell to communism, its neighbors would likely follow","Democracies were naturally stronger and would always outlast communist states"], correct:2},
 ];
 
+SUBJECTS.history.flashcards = coldWarFlashcards;
+SUBJECTS.history.quiz = coldWarQuiz;
+
+// ── MARKETING DATA ─────────────────────────────────────────────
+const marketingFlashcards = [
+  {category:'concept', question:"What is the Marketing Concept?", answer:"A business philosophy focused on satisfying customer needs and wants as the key to achieving company goals."},
+  {category:'concept', question:"What are the 3 types of buying motives?", answer:"Emotional (impulse, little thought), Rational (needs analysis, budget, comparison), and Patronage (loyalty to a brand or store)."},
+  {category:'concept', question:"What is an Emotional purchase?", answer:"Spending with very little thought — driven by feelings, impulse, or mood rather than logic."},
+  {category:'concept', question:"What is a Rational purchase?", answer:"A thoughtful purchase involving recognizing needs and wants, setting budget priorities, and comparing alternatives."},
+  {category:'concept', question:"What is a Patronage purchase?", answer:"Basing a purchase on loyalty to a particular brand, product, or store — even if cheaper alternatives exist."},
+  {category:'concept', question:"What is Mass Marketing?", answer:"A strategy that targets the broadest possible audience with a single message, reaching more people but less precisely."},
+  {category:'concept', question:"What is Target Marketing?", answer:"A strategy that focuses on a specific group of consumers identified through market segmentation."},
+  {category:'concept', question:"Which marketing type reaches a larger audience?", answer:"Mass Marketing — it broadcasts to everyone rather than a specific segment."},
+  {category:'concept', question:"Which marketing type has lower costs?", answer:"Mass Marketing — one campaign for everyone costs less than tailored campaigns for specific segments."},
+  {category:'concept', question:"Which marketing type uses market segmentation?", answer:"Target Marketing — it divides the market into segments and focuses on specific groups."},
+  {category:'vocab', question:"Define: Market Segmentation", answer:"The process of dividing a broad market into distinct subgroups of consumers who have common needs, characteristics, or behaviors."},
+  {category:'vocab', question:"Define: Demographics (segmentation)", answer:"Divides the market using measurable data such as age, income, gender, education, and profession."},
+  {category:'vocab', question:"Define: Psychographics (segmentation)", answer:"Focuses on characteristics that cannot be physically measured — personality, values, lifestyle, interests, and opinions."},
+  {category:'vocab', question:"Define: Behavioral segmentation", answer:"Focuses on customers' attitudes toward, use of, or response to products and services."},
+  {category:'vocab', question:"Define: Geographic segmentation", answer:"Divides the market based on physical location — country, region, city, climate, or neighborhood."},
+  {category:'vocab', question:"Define: Target Market", answer:"The specific group of consumers a business aims its marketing efforts and products toward."},
+  {category:'scenario', question:"What is the bottom line for maintaining successful marketing relationships?", answer:"Customer Satisfaction — keeping customers happy drives repeat business and long-term success."},
+  {category:'scenario', question:"Buying a $30 T-shirt after your favorite college team wins the national championship is an example of what kind of purchase?", answer:"Patronage purchase — you're buying based on loyalty and emotional connection to the team/brand, not rational need."},
+  {category:'scenario', question:"College athletic conferences were historically grouped by geographic proximity. What type of segmentation is that?", answer:"Geographic segmentation — grouping based on physical location."},
+  {category:'scenario', question:"'Females between the ages of 14 and 18' is an example of what?", answer:"A specific market segment — it uses demographic segmentation (age and gender) to define a targeted group."},
+];
+
+const marketingQuiz = [
+  {question:"What is the marketing concept?", options:["The strategy used to get the most sales","Satisfying customer needs and wants as the path to company success","Creating the most advertisements possible","Selling products at the lowest price"], correct:1},
+  {question:"Which of the following describes an Emotional purchase?", options:["Comparing prices across three stores before buying","Buying based on loyalty to your favorite brand","Spending with very little thought, driven by feeling","Budgeting carefully before deciding what to buy"], correct:2},
+  {question:"Which describes a Rational purchase?", options:["Buying impulsively after seeing a sale sign","Purchasing because of loyalty to a brand","Recognizing a need, setting a budget, and comparing alternatives","Buying a jersey after your team wins the championship"], correct:2},
+  {question:"Which describes a Patronage purchase?", options:["Buying on impulse after seeing an ad","Carefully comparing product features and prices","Spending based on loyalty to a particular brand or store","Purchasing based on geographic location"], correct:2},
+  {question:"Which type of marketing reaches a larger audience?", options:["Target Marketing","Mass Marketing","Behavioral Marketing","Psychographic Marketing"], correct:1},
+  {question:"Which type of marketing targets a specific group of consumers?", options:["Mass Marketing","Geographic Marketing","Target Marketing","Demographic Marketing"], correct:2},
+  {question:"Which type of marketing typically has lower marketing costs?", options:["Target Marketing","Behavioral Marketing","Psychographic Marketing","Mass Marketing"], correct:3},
+  {question:"Which type of marketing uses market segmentation?", options:["Mass Marketing","Target Marketing","Broadcast Marketing","Undifferentiated Marketing"], correct:1},
+  {question:"Demographic segmentation divides the market by:", options:["Customer attitudes toward products","Physical location like city or region","Measurable data like age, income, and profession","Personality, values, and lifestyle"], correct:2},
+  {question:"Psychographic segmentation focuses on:", options:["Where customers live geographically","Age, gender, and income data","Personality, values, lifestyle, and interests that cannot be physically measured","Purchase frequency and brand loyalty"], correct:2},
+  {question:"Behavioral segmentation focuses on:", options:["Customer ZIP codes and regions","Age, income, and education levels","Customers' attitudes toward and responses to products","Religious and cultural beliefs"], correct:2},
+  {question:"Geographic segmentation divides the market by:", options:["Customer personality and lifestyle","Age, income, and profession","Physical location such as region, city, or climate","Brand loyalty and purchase history"], correct:2},
+  {question:"'Females between the ages of 14 and 18' is an example of:", options:["The entire population of a country","A specific market segment using demographic data","A mass marketing target audience","A psychographic customer profile"], correct:1},
+  {question:"The bottom line for maintaining successful marketing relationships is:", options:["Profit maximization","Increased market share","Product quality ratings","Customer satisfaction"], correct:3},
+  {question:"Buying a $30 T-shirt right after your college team wins the championship is an example of:", options:["A rational purchase after careful comparison","An emotional impulse with no brand connection","A patronage purchase based on team/brand loyalty","A geographic purchase decision"], correct:2},
+  {question:"College conferences grouped by geographic proximity use what type of segmentation?", options:["Demographic segmentation","Psychographic segmentation","Behavioral segmentation","Geographic segmentation"], correct:3},
+  {question:"Which answer correctly matches Rational purchase behavior?", options:["Buying your usual brand without thinking","Grabbing a snack impulsively at checkout","Researching, budgeting, and comparing before buying a laptop","Buying a team jersey the moment they win"], correct:2},
+  {question:"A company targeting 'outdoor enthusiasts who value sustainability' is using:", options:["Demographic segmentation","Geographic segmentation","Psychographic segmentation","Behavioral segmentation"], correct:2},
+  {question:"Which of the following is NOT a type of market segmentation?", options:["Demographic","Psychographic","Emotional","Geographic"], correct:2},
+  {question:"Market segmentation is used in:", options:["Mass Marketing only","Target Marketing only","Both mass and target marketing equally","Neither — it applies only to advertising agencies"], correct:1},
+];
+
+SUBJECTS.marketing.flashcards = marketingFlashcards;
+SUBJECTS.marketing.quiz = marketingQuiz;
+
+// ═══════════════════════════════════════════════════════════════
+//  PAGE NAVIGATION
+// ═══════════════════════════════════════════════════════════════
+let currentSubject = null;
+
+function goToApp(subject) {
+  currentSubject = subject;
+  const subj = SUBJECTS[subject];
+
+  // Set chapter tag
+  document.getElementById('chapter-tag').textContent = subj.label;
+
+  // Build filter chips
+  const filterRow = document.getElementById('filter-row');
+  filterRow.innerHTML = `<div class="filter-chip active" onclick="setFilter('all',this)">All Cards</div>`;
+  subj.categories.forEach(cat => {
+    const label = cat.charAt(0).toUpperCase() + cat.slice(1);
+    filterRow.innerHTML += `<div class="filter-chip" onclick="setFilter('${cat}',this)">${label}s</div>`;
+  });
+
+  // Init data
+  currentData = subj;
+  fcDeck = [...subj.flashcards];
+  currentFilter = 'all';
+
+  // Switch pages with animation
+  const intro = document.getElementById('intro-page');
+  const app = document.getElementById('app-page');
+  intro.classList.add('slide-out');
+  setTimeout(() => {
+    intro.classList.add('hidden');
+    intro.classList.remove('slide-out');
+    app.classList.remove('hidden');
+    app.classList.add('slide-in-right');
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => { app.classList.remove('slide-in-right'); });
+    });
+    // Init AFTER page is visible so DOM elements are accessible
+    setMode('flashcard');
+    renderFlashcard();
+  }, 350);
+}
+
+function goHome() {
+  const intro = document.getElementById('intro-page');
+  const app = document.getElementById('app-page');
+  app.classList.add('slide-out');
+  setTimeout(() => {
+    app.classList.add('hidden');
+    app.classList.remove('slide-out');
+    intro.classList.remove('hidden');
+    intro.classList.add('slide-in-right');
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => { intro.classList.remove('slide-in-right'); });
+    });
+  }, 350);
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  FLASHCARD STATE
+// ═══════════════════════════════════════════════════════════════
+let currentData = null;
 let currentFilter = 'all';
 let fcDeck = [], fcIndex = 0, isFlipped = false;
-let qShuffled = [], qIndex = 0, qCorrect = 0, qWrong = 0, answered = false;
-let missedQuestions = []; // {question, yourAnswer, correctAnswer}
 
-function buildDeck(f) { return f === 'all' ? [...allFlashcards] : allFlashcards.filter(c => c.category === f); }
+function buildDeck(f) {
+  const cards = currentData.flashcards;
+  return f === 'all' ? [...cards] : cards.filter(c => c.category === f);
+}
 
 function setFilter(f, el) {
   currentFilter = f;
@@ -1018,8 +1261,14 @@ function nextCard() { if (fcIndex < fcDeck.length-1) { fcIndex++; renderFlashcar
 function prevCard() { if (fcIndex > 0) { fcIndex--; renderFlashcard(); } }
 function shuffleCards() { fcDeck = buildDeck(currentFilter).sort(()=>Math.random()-0.5); fcIndex=0; renderFlashcard(); }
 
+// ═══════════════════════════════════════════════════════════════
+//  QUIZ STATE
+// ═══════════════════════════════════════════════════════════════
+let qShuffled = [], qIndex = 0, qCorrect = 0, qWrong = 0, answered = false;
+let missedQuestions = [];
+
 function initQuiz() {
-  qShuffled = [...allQuizQuestions].sort(()=>Math.random()-0.5);
+  qShuffled = [...currentData.quiz].sort(()=>Math.random()-0.5);
   qIndex=0; qCorrect=0; qWrong=0; answered=false; missedQuestions=[];
   document.getElementById('score-screen').classList.add('hidden');
   document.getElementById('question-ui').classList.remove('hidden');
@@ -1049,52 +1298,63 @@ function renderQuestion() {
   const correctText = q.options[q.correct];
   const shuffled = [...q.options].sort(()=>Math.random()-0.5);
   shuffled.forEach((opt,i) => {
+    const wrap = document.createElement('div');
+    wrap.className = 'option-wrap';
     const btn = document.createElement('button');
     btn.className = 'option-btn';
     btn.dataset.correct = opt === correctText ? '1' : '0';
     btn.innerHTML = `<span class="option-letter">${letters[i]}</span>${opt}`;
     btn.onclick = () => selectOption(btn, correctText);
-    container.appendChild(btn);
+    wrap.appendChild(btn);
+    container.appendChild(wrap);
   });
 }
 
 function selectOption(btn, correctText) {
   if (answered) return;
   answered = true;
-  btn.classList.add('clicked');
-  btn.addEventListener('animationend', () => btn.classList.remove('clicked'), {once: true});
+
+  // Press animation on the wrapper
+  const wrap = btn.parentElement;
+  wrap.classList.add('press');
+  wrap.addEventListener('animationend', () => wrap.classList.remove('press'), {once: true});
+
   const isCorrect = btn.dataset.correct === '1';
-  document.querySelectorAll('.option-btn').forEach(b => { b.disabled = true; if (b.dataset.correct==='1') b.classList.add('correct'); });
-  if (!isCorrect) {
-    btn.classList.add('wrong');
-    qWrong++;
-    missedQuestions.push({
-      question: qShuffled[qIndex].question,
-      yourAnswer: btn.querySelector('.option-letter') ? btn.textContent.replace(btn.querySelector('.option-letter').textContent, '').trim() : btn.textContent.trim(),
-      correctAnswer: correctText
+
+  // Short delay so press animation plays first, then reveal result
+  setTimeout(() => {
+    document.querySelectorAll('.option-btn').forEach(b => {
+      b.disabled = true;
+      if (b.dataset.correct === '1') {
+        b.classList.add('correct');
+        b.parentElement.classList.add('correct-wrap');
+      }
     });
-  } else { qCorrect++; }
-  const fb = document.getElementById('feedback');
-  fb.textContent = isCorrect ? '✓ Correct!' : `✗ The correct answer was: ${correctText}`;
-  fb.className = `feedback show ${isCorrect ? 'correct-fb' : 'wrong-fb'}`;
-  document.getElementById('next-btn').classList.add('show');
+    if (!isCorrect) {
+      btn.classList.add('wrong');
+      wrap.classList.add('wrong-wrap');
+      qWrong++;
+      missedQuestions.push({
+        question: qShuffled[qIndex].question,
+        yourAnswer: btn.querySelector('.option-letter') ? btn.textContent.replace(btn.querySelector('.option-letter').textContent,'').trim() : btn.textContent.trim(),
+        correctAnswer: correctText
+      });
+    } else { qCorrect++; }
+
+    const fb = document.getElementById('feedback');
+    fb.textContent = isCorrect ? '✓ Correct!' : `✗ The correct answer was: ${correctText}`;
+    fb.className = `feedback show ${isCorrect ? 'correct-fb' : 'wrong-fb'}`;
+    document.getElementById('next-btn').classList.add('show');
+  }, 120);
 }
 
 function nextQuestion() { if (qIndex < qShuffled.length-1) { qIndex++; renderQuestion(); } else { showScore(); } }
 
 function getLetterGrade(pct) {
-  if (pct >= 93) return 'A';
-  if (pct >= 90) return 'A';
-  if (pct >= 87) return 'B';
-  if (pct >= 83) return 'B';
-  if (pct >= 80) return 'B';
-  if (pct >= 77) return 'C';
-  if (pct >= 73) return 'C';
-  if (pct >= 70) return 'C';
-  if (pct >= 67) return 'D';
-  if (pct >= 63) return 'D';
-  if (pct >= 60) return 'D';
-  return 'F';
+  if (pct >= 93) return 'A'; if (pct >= 90) return 'A'; if (pct >= 87) return 'B';
+  if (pct >= 83) return 'B'; if (pct >= 80) return 'B'; if (pct >= 77) return 'C';
+  if (pct >= 73) return 'C'; if (pct >= 70) return 'C'; if (pct >= 67) return 'D';
+  if (pct >= 63) return 'D'; if (pct >= 60) return 'D'; return 'F';
 }
 
 function showScore() {
@@ -1102,65 +1362,40 @@ function showScore() {
   document.getElementById('score-screen').classList.remove('hidden');
   document.getElementById('results-summary').classList.remove('hidden');
   document.getElementById('missed-review').classList.add('hidden');
-
-  const pct = Math.round((qCorrect / qShuffled.length) * 100);
-  const grade = getLetterGrade(pct);
-
+  const pct = Math.round((qCorrect/qShuffled.length)*100);
   document.getElementById('score-num').textContent = qCorrect;
   document.getElementById('score-total').textContent = `of ${qShuffled.length}`;
   document.getElementById('score-pct').textContent = `${pct}%`;
   document.getElementById('bd-correct').textContent = qCorrect;
   document.getElementById('bd-wrong').textContent = qWrong;
   document.getElementById('bd-total').textContent = qShuffled.length;
-
   const gb = document.getElementById('grade-badge');
-  const gradeClass = grade.charAt(0);
-  gb.textContent = pct >= 93 ? 'A+' : pct >= 90 ? 'A' : pct >= 87 ? 'B+' : pct >= 83 ? 'B' : pct >= 80 ? 'B-' : pct >= 77 ? 'C+' : pct >= 73 ? 'C' : pct >= 70 ? 'C-' : pct >= 67 ? 'D+' : pct >= 63 ? 'D' : pct >= 60 ? 'D-' : 'F';
-  gb.className = `grade-badge ${gradeClass}`;
-
+  gb.textContent = pct>=93?'A+':pct>=90?'A':pct>=87?'B+':pct>=83?'B':pct>=80?'B-':pct>=77?'C+':pct>=73?'C':pct>=70?'C-':pct>=67?'D+':pct>=63?'D':pct>=60?'D-':'F';
+  gb.className = `grade-badge ${getLetterGrade(pct)}`;
   let msg;
-  if (pct === 100) msg = 'Perfect score! 🎉';
-  else if (pct >= 90) msg = 'Excellent work! 🌟';
-  else if (pct >= 80) msg = 'Great job! 💪';
-  else if (pct >= 70) msg = 'Good effort!';
-  else if (pct >= 60) msg = 'Almost there!';
-  else msg = 'Keep studying! 📚';
+  if (pct===100) msg='Perfect score! 🎉';
+  else if (pct>=90) msg='Excellent work! 🌟';
+  else if (pct>=80) msg='Great job! 💪';
+  else if (pct>=70) msg='Good effort!';
+  else if (pct>=60) msg='Almost there!';
+  else msg='Keep studying! 📚';
   document.getElementById('score-msg').textContent = msg;
-
-  // Show/hide review missed button
   const reviewBtn = document.getElementById('review-missed-btn');
-  if (missedQuestions.length === 0) {
-    reviewBtn.style.display = 'none';
-  } else {
-    reviewBtn.style.display = '';
-    reviewBtn.textContent = `Review ${missedQuestions.length} Missed`;
-  }
+  if (missedQuestions.length === 0) { reviewBtn.style.display = 'none'; }
+  else { reviewBtn.style.display = ''; reviewBtn.textContent = `Review ${missedQuestions.length} Missed`; }
 }
 
 function showMissedReview() {
   document.getElementById('results-summary').classList.add('hidden');
   document.getElementById('missed-review').classList.remove('hidden');
   document.getElementById('missed-count-badge').textContent = missedQuestions.length;
-
   const list = document.getElementById('missed-list');
   list.innerHTML = '';
-  missedQuestions.forEach((m, i) => {
+  missedQuestions.forEach((m,i) => {
     const div = document.createElement('div');
     div.className = 'missed-item';
-    div.style.animationDelay = `${i * 0.06}s`;
-    div.innerHTML = `
-      <div class="missed-q-label">Question ${i + 1} — Incorrect</div>
-      <div class="missed-q-text">${m.question}</div>
-      <div class="missed-answers">
-        <div class="missed-answer your-ans">
-          <span class="ans-icon">✗</span>
-          <div><span class="ans-label">Your answer</span>${m.yourAnswer}</div>
-        </div>
-        <div class="missed-answer right-ans">
-          <span class="ans-icon">✓</span>
-          <div><span class="ans-label">Correct answer</span>${m.correctAnswer}</div>
-        </div>
-      </div>`;
+    div.style.animationDelay = `${i*0.06}s`;
+    div.innerHTML = `<div class="missed-q-label">Question ${i+1} — Incorrect</div><div class="missed-q-text">${m.question}</div><div class="missed-answers"><div class="missed-answer your-ans"><span class="ans-icon">✗</span><div><span class="ans-label">Your answer</span>${m.yourAnswer}</div></div><div class="missed-answer right-ans"><span class="ans-icon">✓</span><div><span class="ans-label">Correct answer</span>${m.correctAnswer}</div></div></div>`;
     list.appendChild(div);
   });
 }
@@ -1173,22 +1408,20 @@ function showResultsSummary() {
 function restartQuiz() { initQuiz(); }
 
 function setMode(mode) {
-  document.querySelectorAll('.mode-btn').forEach((b,i) => b.classList.toggle('active', (i===0&&mode==='flashcard')||(i===1&&mode==='quiz')));
+  document.querySelectorAll('.mode-btn').forEach((b,i) => b.classList.toggle('active',(i===0&&mode==='flashcard')||(i===1&&mode==='quiz')));
   document.getElementById('flashcard-mode').classList.toggle('hidden', mode!=='flashcard');
   document.getElementById('quiz-mode').classList.toggle('hidden', mode!=='quiz');
   if (mode==='quiz') initQuiz();
 }
 
 document.addEventListener('keydown', e => {
+  if (document.getElementById('app-page').classList.contains('hidden')) return;
   if (!document.getElementById('flashcard-mode').classList.contains('hidden')) {
     if (e.key==='ArrowRight') nextCard();
     if (e.key==='ArrowLeft') prevCard();
     if (e.key===' ') { e.preventDefault(); flipCard(); }
   }
 });
-
-fcDeck = buildDeck('all');
-renderFlashcard();
 </script>
 </body>
 </html>
