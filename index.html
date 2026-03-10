@@ -151,10 +151,6 @@ body {
 .subject-card:hover::before { opacity: 1; }
 .subject-card:active { transform: translateY(0) scale(0.99); }
 
-.subject-card.history::before { background: linear-gradient(135deg, rgba(200,240,96,0.04), transparent); }
-.subject-card.history:hover { border-color: rgba(200,240,96,0.25); }
-.subject-card.marketing::before { background: linear-gradient(135deg, rgba(240,160,96,0.05), transparent); }
-.subject-card.marketing:hover { border-color: rgba(240,160,96,0.25); }
 
 .subject-icon {
   width: clamp(44px,12vw,56px);
@@ -168,8 +164,6 @@ body {
   position: relative;
   z-index: 1;
 }
-.subject-card.history .subject-icon { background: rgba(200,240,96,0.1); }
-.subject-card.marketing .subject-icon { background: rgba(240,160,96,0.1); }
 
 .subject-info { flex: 1; position: relative; z-index: 1; }
 .subject-title {
@@ -188,8 +182,6 @@ body {
   font-size: var(--text-xs);
   color: var(--muted);
 }
-.subject-card.history .subject-pill { border-color: rgba(200,240,96,0.2); color: rgba(200,240,96,0.7); }
-.subject-card.marketing .subject-pill { border-color: rgba(240,160,96,0.2); color: rgba(240,160,96,0.7); }
 
 .subject-arrow {
   font-size: 1.1rem;
@@ -862,7 +854,7 @@ body {
         <div class="splash-logo">Study<em>Flow</em></div>
         <div class="splash-tagline">Welcome to StudyFlow</div>
         <div class="splash-sub">Your personal study companion</div>
-        <button class="splash-btn" onclick="dismissSplash()">
+        <button class="splash-btn" id="splash-begin-btn">
           <span class="splash-btn-text">Begin Studying</span>
           <span class="splash-btn-icon">→</span>
         </button>
@@ -900,27 +892,14 @@ body {
   <div class="intro-subjects-label">Choose a subject to study</div>
 
   <div class="intro-subjects">
-    <div class="subject-card history" onclick="goToApp('history')">
-      <div class="subject-icon">🏛️</div>
+    <div class="subject-card hydro" onclick="goToApp('hydro')">
+      <div class="subject-icon">💧</div>
       <div class="subject-info">
-        <div class="subject-title">US History</div>
-        <div class="subject-meta">Chapter 14 · Cold War Review</div>
+        <div class="subject-title">Hydro Cycle Study Guide</div>
+        <div class="subject-meta">Hydrosphere Part 1 · Unit Review</div>
         <div class="subject-pills">
-          <span class="subject-pill">42 flashcards</span>
-          <span class="subject-pill">42 quiz questions</span>
-        </div>
-      </div>
-      <div class="subject-arrow">›</div>
-    </div>
-
-    <div class="subject-card marketing" onclick="goToApp('marketing')">
-      <div class="subject-icon">📊</div>
-      <div class="subject-info">
-        <div class="subject-title">Sports & Entertainment Marketing</div>
-        <div class="subject-meta">Chapter 2 · Marketing Concepts</div>
-        <div class="subject-pills">
-          <span class="subject-pill">20 flashcards</span>
-          <span class="subject-pill">20 quiz questions</span>
+          <span class="subject-pill">32 flashcards</span>
+          <span class="subject-pill">32 quiz questions</span>
         </div>
       </div>
       <div class="subject-arrow">›</div>
@@ -1038,6 +1017,11 @@ body {
 
 
 <script>
+// Attach splash button immediately - before any other JS runs
+document.addEventListener('DOMContentLoaded', function() {
+  var btn = document.getElementById('splash-begin-btn');
+  if (btn) btn.addEventListener('click', dismissSplash);
+});
 
 // ── SPLASH ────────────────────────────────────────────────────
 function dismissSplash() {
@@ -1051,169 +1035,90 @@ function dismissSplash() {
 // ═══════════════════════════════════════════════════════════════
 
 const SUBJECTS = {
-  history: {
-    label: 'US History · Chapter 14 · Cold War Review',
-    categories: ['concept','vocab','people','event'],
-    flashcards: null, // assigned below
-    quiz: null,
-  },
-  marketing: {
-    label: 'Sports & Entertainment Marketing · Chapter 2 · Marketing Concepts',
-    categories: ['concept','vocab','scenario'],
+  hydro: {
+    label: 'Hydrosphere · Part 1 · Unit Review',
+    categories: ['properties','water-cycle','groundwater','farming'],
     flashcards: null,
     quiz: null,
   }
 };
 
-// ── COLD WAR DATA ──────────────────────────────────────────────
-const coldWarFlashcards = [
-  {category:'concept', question:"How did the United Nations embody the ideals set forth in the Atlantic Charter?", answer:"The UN promoted international peace, cooperation, and self-determination — core ideals of the Atlantic Charter signed by FDR and Churchill in 1941."},
-  {category:'concept', question:"Why did so many Republicans support the claims of Joseph McCarthy?", answer:"Republicans used McCarthy's anti-communist claims as a political weapon against Democrats, and many Americans feared communist infiltration during the Red Scare."},
-  {category:'concept', question:"What prompted the Soviet Union to create the Warsaw Pact?", answer:"The Soviets formed the Warsaw Pact in 1955 in response to West Germany joining NATO — creating a rival military alliance among Eastern Bloc nations."},
-  {category:'concept', question:"What was the Eastern Bloc?", answer:"The group of Soviet-dominated communist countries in Eastern Europe, including Poland, Czechoslovakia, Hungary, Romania, Bulgaria, and East Germany."},
-  {category:'concept', question:"What caused unions to go on strike in the aftermath of World War II?", answer:"Workers demanded higher wages and better conditions after wartime wage controls were lifted, leading to massive strikes in steel, auto, and mining industries."},
-  {category:'concept', question:"How did the Marshall Plan affect the economies of European countries and the United States?", answer:"It provided $13 billion in U.S. aid to rebuild Western Europe, preventing communist spread and opening new markets for American goods — benefiting both sides."},
-  {category:'concept', question:"Why did the Soviet Union choose not to take part in the Marshall Plan?", answer:"The Soviets viewed it as American economic imperialism designed to extend U.S. influence into Eastern Europe, so they rejected it and pressured satellite states to do the same."},
-  {category:'concept', question:"Describe the connection between World War II and the spread of communism in Europe.", answer:"WWII devastated European economies, creating instability communist parties exploited. Soviet military presence in Eastern Europe let Stalin impose communist regimes."},
-  {category:'concept', question:"During which period of the Korean War did North Korea make the greatest advances?", answer:"Summer of 1950 (June–September), when North Korea pushed UN/South Korean forces nearly off the peninsula to the Pusan Perimeter."},
-  {category:'concept', question:"What happened in the Korean War between September 15 and November 25, 1950?", answer:"MacArthur's Inchon landing (Sept. 15) turned the tide. UN forces pushed north to the Chinese border, prompting China to enter the war in late November."},
-  {category:'concept', question:"In addition to the United States, who else fought alongside South Korea in the Korean War?", answer:"16 nations sent troops under the UN flag, including the UK, Canada, Australia, Turkey, and France."},
-  {category:'concept', question:"What reason did Senator Joseph McCarthy give for the United States losing the Cold War?", answer:"McCarthy claimed communist spies and traitors had infiltrated the U.S. government, military, and media — sabotaging American efforts from within."},
-  {category:'concept', question:"How did McCarthy's actions change after the election of 1952?", answer:"After Republicans won, McCarthy became Senate committee chairman and escalated his investigations — eventually targeting the U.S. Army, which led to his downfall."},
-  {category:'concept', question:"Why was China's shift to communism a serious loss to the United States?", answer:"China was the world's most populous nation. Its fall to communism in 1949 massively expanded the communist world and was seen as a major failure of U.S. foreign policy."},
-  {category:'concept', question:"Why was the Soviets' test of an atomic bomb in 1949 shocking?", answer:"The U.S. expected to hold a nuclear monopoly for years longer. The Soviet test ended that advantage, intensified the arms race, and dramatically heightened Cold War tensions."},
-  {category:'concept', question:"What might Europeans have feared about the Marshall Plan?", answer:"Some Europeans feared becoming economically dependent on the U.S. or being drawn into American Cold War politics; Eastern Europeans were pressured by the USSR to reject it."},
-  {category:'concept', question:"How did the Federal Republic of Germany come to be?", answer:"After WWII Germany was split into four occupation zones. The three Western zones (U.S., UK, France) merged in 1949 to form the democratic West Germany."},
-  {category:'people', question:"How did Chinese Nationalist Chiang Kai-shek compare to the communist Mao Zedong?", answer:"Chiang led the Nationalist government but was seen as corrupt and ineffective. Mao led a disciplined communist movement with strong peasant support, ultimately defeating Chiang."},
-  {category:'people', question:"To which place did Chiang Kai-shek flee after Mao Zedong created the People's Republic of China?", answer:"Chiang fled to Taiwan (Formosa) in 1949, where he established the Republic of China government."},
-  {category:'people', question:"Why were the 'Hollywood Ten' charged with contempt of Congress?", answer:"They were screenwriters and directors who refused to answer HUAC's questions about communist influence in Hollywood, citing First Amendment rights — and were jailed for contempt."},
-  {category:'event', question:"Why were the Venona Papers important?", answer:"The Venona Papers were decoded Soviet cables that revealed real Soviet espionage in the U.S., confirming that some accused spies (including the Rosenbergs) did work for the USSR."},
-  {category:'event', question:"What was the Manhattan Project?", answer:"The top-secret U.S. (with UK and Canada) WWII program to develop the world's first atomic bomb, culminating in the bombings of Hiroshima and Nagasaki in August 1945."},
-  {category:'vocab', question:"Define: Containment", answer:"The U.S. foreign policy strategy of preventing the further spread of communism beyond where it already existed, first articulated by diplomat George Kennan."},
-  {category:'vocab', question:"Define: Occupation Zone", answer:"A section of a defeated country controlled by an Allied power after WWII. Germany was divided into American, British, French, and Soviet occupation zones."},
-  {category:'vocab', question:"Define: Demilitarized Zone (DMZ)", answer:"A buffer zone where military activity is forbidden. In Korea, the DMZ near the 38th parallel separates North and South Korea."},
-  {category:'vocab', question:"Define: Proxy War", answer:"A conflict where two major powers (U.S. and USSR) support opposing sides in a smaller country's war rather than fighting each other directly."},
-  {category:'vocab', question:"Define: GI Bill", answer:"The Servicemen's Readjustment Act of 1944 — provided veterans with college funding, low-cost mortgages, loans, and unemployment benefits, helping build the postwar middle class."},
-  {category:'vocab', question:"Define: Rural Electrification", answer:"Government programs extending electrical power to rural and farming areas, improving quality of life and agricultural productivity across America."},
-  {category:'vocab', question:"Define: Government-in-exile", answer:"A political group that claims to be a country's legitimate government but operates outside its territory because it has been overthrown or occupied."},
-  {category:'vocab', question:"Define: Libel", answer:"A published false statement that damages a person's reputation. McCarthyism-era accusations often bordered on libel but were protected by congressional immunity."},
-  {category:'vocab', question:"Define: Iron Curtain", answer:"Winston Churchill's term for the political and ideological division between Soviet-controlled Eastern Europe and the democratic West during the Cold War."},
-  {category:'vocab', question:"Define: White-collar", answer:"Refers to professional or office workers (as opposed to blue-collar manual laborers). The postwar era saw massive growth in white-collar jobs due to economic expansion."},
-  {category:'vocab', question:"Define: Hydrogen Bomb", answer:"A thermonuclear weapon far more powerful than an atomic bomb. The U.S. tested one in 1952, the Soviets in 1953 — dramatically escalating the nuclear arms race."},
-  {category:'vocab', question:"Define: Loyalty Oath", answer:"A pledge of allegiance to the U.S. government, required of government employees during the Red Scare to prove they were not communist sympathizers."},
-  {category:'vocab', question:"Define: Liberal Consensus", answer:"The postwar agreement among most Americans that government should support social programs, economic growth, and an active foreign policy to contain communism."},
-  {category:'vocab', question:"Define: Aerospace Industry", answer:"The industry developing aircraft, missiles, and spacecraft. It boomed during the Cold War due to military demand and the Space Race between the U.S. and USSR."},
-  {category:'vocab', question:"Define: Infrastructure", answer:"Basic public systems like roads, bridges, schools, water, and power. Cold War-era spending included the Interstate Highway System, partly justified by military necessity."},
-  {category:'vocab', question:"Define: McCarthyism", answer:"The practice of making unfair, unproven accusations of communist activity or disloyalty during the early 1950s Red Scare — named after Senator Joseph McCarthy."},
-  {category:'vocab', question:"Define: Marshall Plan", answer:"The 1948 U.S. program providing over $13 billion in economic aid to rebuild Western European countries after WWII, named after Secretary of State George Marshall."},
-  {category:'vocab', question:"Define: Arms Race", answer:"The Cold War competition between the U.S. and USSR to develop and stockpile increasingly powerful nuclear and conventional weapons to achieve military superiority."},
-  {category:'vocab', question:"Define: Military-Industrial Complex", answer:"The powerful relationship between the military and defense industries. President Eisenhower famously warned against its growing influence in his 1961 farewell address."},
-  {category:'vocab', question:"Define: Subversion", answer:"Attempting to undermine or overthrow a government from within. Fear of communist subversion drove McCarthyism and HUAC investigations throughout the early 1950s."},
-  {category:'vocab', question:"Define: Domino Theory", answer:"The belief that if one country fell to communism, neighbors would follow like falling dominoes — used to justify U.S. involvement in Korea and later Vietnam."},
+// ── HYDROSPHERE DATA ──────────────────────────────────────────
+const hydroFlashcards = [
+  {category:'properties', question:"Water is a _______ substance, meaning it will NOT mix with _______ substances.", answer:"Polar — will NOT mix with nonpolar substances. Polar molecules have an uneven charge distribution."},
+  {category:'properties', question:"Ice floats because water _______ as a solid.", answer:"Expands. Water becomes less dense as a solid, so ice floats on liquid water — unlike most substances."},
+  {category:'properties', question:"Water has to absorb much heat before its temperature starts to rise. Which property is this?", answer:"High specific heat — water resists temperature change, which is why oceans moderate Earth's climate."},
+  {category:'properties', question:'Opposites _______', answer:'Attract. Opposite charges attract each other — this is why polar water dissolves many ionic substances.'},
+  {category:'properties', question:"Surface tension, water moving 'against gravity', and water droplets on a table are explained by:", answer:"Cohesion — water molecules sticking to each other through hydrogen bonds."},
+  {category:'properties', question:"Which is an example of adhesion?", answer:"All of the above: water droplets running down a glass, water staying on a penny, and tree frogs sticking to surfaces — all involve water or substances sticking to other surfaces."},
+  {category:'properties', question:"The opposite of evaporation is _______", answer:"Condensation — water vapor cools and turns back into liquid water."},
+
+  {category:'water-cycle', question:"Deforestation most directly affects which part of the water cycle?", answer:"Transpiration — trees release water vapor; fewer trees means less transpiration."},
+  {category:'water-cycle', question:"Bethalto is very flat. Because of this, we will have higher amounts of _______", answer:"Runoff — flat land doesn't slow water down or let it infiltrate, so it flows across the surface."},
+  {category:'water-cycle', question:"True/False: An aquifer is underground/below Earth's surface.", answer:"TRUE — aquifers are underground layers of permeable rock or sediment saturated with groundwater."},
+  {category:'water-cycle', question:"Deforestation will lead to a(n) _______ in runoff.", answer:"Increase — without roots to absorb water and slow its flow, more water becomes surface runoff."},
+  {category:'water-cycle', question:"Which type of water is most commonly found on Earth's surface?", answer:"Salt water — about 97% of all water on Earth is saltwater found in oceans."},
+  {category:'water-cycle', question:"An area of land where all water drains to a certain body of water is a _______.", answer:"Watershed — all precipitation in that area eventually flows to the same river, lake, or ocean."},
+  {category:'water-cycle', question:"The _______ elevation in a watershed forms the divide between watersheds.", answer:"Highest elevation — the divide sits at the highest point; water flows downhill away from it in both directions."},
+  {category:'water-cycle', question:"A mountain stream is an example of _______", answer:"Headwaters — the source or upper portion of a river system; cold, fast-flowing, and high in oxygen."},
+  {category:'water-cycle', question:"Which is NOT a characteristic of waters at higher elevations?", answer:"Murky — higher elevation water is clear, cold, fast-flowing, and has low biodiversity."},
+  {category:'water-cycle', question:"If water goes from cold & fast to warm & slow, there has been a change in _______", answer:"Elevation — as water moves to lower elevations it slows down, warms up, and carries more sediment."},
+  {category:'water-cycle', question:"Where the Mississippi River pours into the Gulf of Mexico is an example of a(n) _______", answer:"Estuary — where freshwater meets saltwater; a transition zone at the mouth of a river."},
+  {category:'water-cycle', question:"What are examples of pollutants that get into surface waters?", answer:"All of the above — oil, excess chemicals/nutrients (like fertilizers), and human waste/litter all pollute surface water."},
+  {category:'water-cycle', question:"True/False: Using excess personal water is a tragedy of the commons.", answer:"TRUE — freshwater is a limited shared resource, so individual overuse depletes what everyone depends on."},
+
+  {category:'groundwater', question:"What is an example of an aquifer in the Midwest?", answer:"The Ogallala Aquifer — one of the world's largest, spanning 8 states across the Great Plains."},
+  {category:'groundwater', question:"Which statement is FALSE about groundwater?", answer:"'It cannot be recharged' is FALSE — groundwater can recharge, though confined aquifers recharge very slowly."},
+  {category:'groundwater', question:"Groundwater is MOST used for _______", answer:"Farming — agriculture is the largest user of groundwater worldwide, mainly for irrigation."},
+  {category:'groundwater', question:"The water table separates the _______ and _______ zones underground.", answer:"Saturated (below) and unsaturated (above) zones. The water table is the top of the saturated zone."},
+  {category:'groundwater', question:"The 'man-made' version of a spring is _______", answer:"A well/pump — drilled down to the water table or aquifer to bring groundwater to the surface."},
+  {category:'groundwater', question:"Which layer of an aquifer is IMpermeable?", answer:"The aquitard — a layer of clay or solid rock that water cannot pass through, confining the aquifer below."},
+  {category:'groundwater', question:"Confined and unconfined aquifers are both made up of groundwater and _______.", answer:"Rock — permeable rock (or sediment) holds and transmits the water in both types of aquifer."},
+  {category:'groundwater', question:"Running aquifers dry is a concern because confined aquifers take a long time to _______.", answer:"Recharge — sealed by impermeable layers, confined aquifers refill extremely slowly, sometimes over thousands of years."},
+
+  {category:'farming', question:"Which is NOT a common type of irrigation?", answer:"Grid irrigation — common types are drip, furrow (channel), and spray/sprinkler irrigation."},
+  {category:'farming', question:"The Dust Bowl occurred because of poor farming techniques and _______.", answer:"All of the above — high winds, prolonged drought, and lack of irrigation all contributed to the Dust Bowl."},
+  {category:'farming', question:"Recent farming techniques that have been invented will help to prevent _______", answer:"Another Dust Bowl — techniques like no-till farming, cover crops, and contour plowing protect topsoil."},
+  {category:'farming', question:"To help prevent another Dust Bowl, the government _______.", answer:"Purchased land to restore grassland areas — the government bought and replanted native grasses to anchor soil."},
 ];
 
-const coldWarQuiz = [
-  // ── CONCEPTS ──
-  {question:"How did the United Nations reflect the ideals of the Atlantic Charter?", options:["It formed a military alliance against the USSR","It promoted peace, cooperation, and self-determination","It gave the U.S. permanent control over all votes","It replaced national governments with one world body"], correct:1},
-  {question:"Why did many Republicans back McCarthy's anti-communist crusade?", options:["They verified his evidence before supporting him","They feared losing elections if they opposed him","They used it as a political weapon against Democrats","Congress required them to support his investigations"], correct:2},
-  {question:"What directly triggered the creation of the Warsaw Pact in 1955?", options:["The U.S. testing the first hydrogen bomb","The Soviet Union leaving the United Nations","West Germany being admitted into NATO","Stalin's death leaving the USSR without leadership"], correct:2},
-  {question:"The Eastern Bloc was made up of:", options:["Western democracies that partnered with the U.S.","Soviet-dominated communist nations in Eastern Europe","Asian countries that rejected Marshall Plan aid","Neutral nations caught between the U.S. and USSR"], correct:1},
-  {question:"What sparked the massive labor strikes in the U.S. right after WWII?", options:["Workers angry about atomic bomb use in Japan","Unions pushing for higher wages once wartime controls lifted","Veterans refusing factory jobs after returning home","Workers protesting U.S. involvement in Korea"], correct:1},
-  {question:"How did the Marshall Plan affect U.S. interests abroad?", options:["It gave the U.S. military bases in exchange for aid","It rebuilt European economies and opened new American export markets","It forced European nations to adopt U.S. laws","It paid Europe's war debts to the United States"], correct:1},
-  {question:"Why did the USSR refuse to join the Marshall Plan?", options:["The U.S. never formally invited the Soviet Union","Stalin believed the aid dollars were counterfeit","They saw it as U.S. imperialism aimed at influencing Eastern Europe","The Soviet economy had already fully recovered from the war"], correct:2},
-  {question:"How did WWII help communism spread across Europe?", options:["The U.S. secretly promoted communism post-war","Communist parties won democratic elections across Europe","War devastation created instability that communists exploited, backed by Soviet troops","Britain and France invited Soviet advisors into their colonies"], correct:2},
-  {question:"When did North Korea make its greatest military advances in the Korean War?", options:["Spring 1951, during China's big offensive push","Summer 1950, nearly pushing UN forces off the peninsula","Winter 1950, right after China entered the conflict","Fall 1952, in the final months before a ceasefire"], correct:1},
-  {question:"What happened in Korea between September 15 and November 25, 1950?", options:["A ceasefire was signed and both sides pulled back","MacArthur landed at Inchon, then China entered as UN forces neared the border","North Korea surrendered following the Inchon landing","The Soviet Union sent troops to reinforce North Korea"], correct:1},
-  {question:"Which nations fought alongside the U.S. in South Korea's defense?", options:["Only South Korean troops fought; the U.S. acted alone","Japan and Australia but no European nations","16 countries under the UN flag, including UK, Canada, and Turkey","Only NATO member nations contributed troops"], correct:2},
-  {question:"McCarthy claimed the Cold War was going badly because:", options:["America's military spending was far too low","Nuclear weapons were draining the federal budget","Communist infiltrators had sabotaged the government from within","The Marshall Plan had weakened American industry"], correct:2},
-  {question:"How did McCarthy's actions shift after Republicans won in 1952?", options:["He quietly dropped his accusations once his party held power","He retired after achieving his anti-communist goals","He gained a Senate chairmanship, escalated attacks, then collapsed after targeting the Army","He narrowed his focus exclusively to Hollywood celebrities"], correct:2},
-  {question:"Why was China's communist revolution in 1949 seen as a Cold War disaster for the U.S.?", options:["China had been a formal U.S. territory since the 1800s","The world's most populous nation joining communism massively shifted the global balance","The U.S. had spent billions building China's democratic institutions","China had signed a treaty promising to oppose the Soviet Union"], correct:1},
-  {question:"Why did the Soviet atom bomb test of 1949 shock the American public?", options:["The bomb was secretly detonated on American soil","A Soviet city was accidentally destroyed during the test","Americans assumed the U.S. nuclear monopoly would last much longer","Soviet leaders threatened a nuclear strike on Washington"], correct:2},
-  {question:"What concern might Western Europeans have had about the Marshall Plan?", options:["That inflation would destroy their currencies","That they would owe the U.S. soldiers in exchange for aid","That it would make them economically dependent on or politically tied to the U.S.","That the Soviets would retaliate with immediate military invasion"], correct:2},
-  {question:"How did West Germany (Federal Republic of Germany) come to exist?", options:["All Germans voted in a UN-supervised national election","The Soviets voluntarily handed over their occupation zone","The three Western Allied zones merged into one democratic state","The United Nations drew a permanent border dividing Germany"], correct:2},
-  // ── PEOPLE ──
-  {question:"How did Chiang Kai-shek and Mao Zedong differ as leaders?", options:["Both were communists who competed for Soviet support","Chiang was seen as corrupt and weak; Mao built disciplined peasant loyalty","Chiang was the revolutionary hero; Mao was the oppressive ruler","They were wartime allies who split over economic policy"], correct:1},
-  {question:"After losing China's civil war, where did Chiang Kai-shek establish his government?", options:["Japan","Hong Kong","South Korea","Taiwan (Formosa)"], correct:3},
-  {question:"Why were the Hollywood Ten jailed for contempt of Congress?", options:["They produced films that contained Soviet propaganda","They gave money directly to the Communist Party USA","They refused to answer HUAC's questions, citing their First Amendment rights","They leaked classified military scripts to Soviet agents"], correct:2},
-  // ── EVENTS ──
-  {question:"What made the Venona Papers historically important?", options:["They exposed the entire U.S. nuclear weapons blueprint","They were decoded Soviet messages proving real spies had infiltrated U.S. agencies","They proved McCarthy had invented all of his accusations","They contained the original drafts of the Marshall Plan"], correct:1},
-  {question:"What was the Manhattan Project?", options:["A postwar program to modernize New York's harbor","A Soviet espionage network targeting American scientists","The secret Allied program that built the first atomic bomb","A diplomatic initiative to prevent nuclear weapons spread"], correct:2},
-  // ── VOCABULARY ──
-  {question:"The U.S. policy of 'containment' aimed to:", options:["Destroy communism wherever it already existed","Keep the U.S. out of all overseas conflicts","Stop communism from spreading beyond its current borders","Control Soviet nuclear weapons through direct treaties"], correct:2},
-  {question:"An 'occupation zone' after WWII was:", options:["A UN-controlled neutral buffer territory","A section of a defeated nation run by an Allied power","A demilitarized strip separating the two Koreas","A region where nuclear testing was permanently banned"], correct:1},
-  {question:"The DMZ in Korea refers to:", options:["A nuclear-free belt covering all of East Asia","A fortified buffer near the 38th parallel dividing the two Koreas","The coastal zone near Inchon where MacArthur landed","The mountainous border region between China and North Korea"], correct:1},
-  {question:"A 'proxy war' during the Cold War was:", options:["A war using only nuclear or chemical weapons","A direct military clash between U.S. and Soviet armies","A conflict where the U.S. and USSR backed opposing sides indirectly","A secret war funded entirely by the United Nations"], correct:2},
-  {question:"The GI Bill mainly offered veterans:", options:["Funding to work in the nuclear weapons industry","Education, housing loans, and economic support for civilian reentry","A mandatory peacetime military service requirement","Priority hiring for federal government positions"], correct:1},
-  {question:"Rural electrification programs primarily aimed to:", options:["Power remote nuclear research facilities","Bring electrical service to farms and rural communities","Employ veterans returning from overseas service","Build out the Interstate Highway System's lighting grid"], correct:1},
-  {question:"A 'government-in-exile' is best described as:", options:["A puppet regime set up by an occupying foreign power","A legitimate government operating outside its own country after being removed","A temporary wartime council governing until peace returns","A neutral government refusing to take sides in a conflict"], correct:1},
-  {question:"Libel is:", options:["The crime of refusing to testify before Congress","Passing government secrets to a foreign power","A false published statement that harms someone's reputation","Publicly declaring support for a foreign political ideology"], correct:2},
-  {question:"Churchill used 'Iron Curtain' to describe:", options:["The physical wall dividing East and West Berlin","The ideological divide separating communist East from democratic West Europe","The Soviet Union's anti-missile defense network","The heavily guarded fence along the East-West German border"], correct:1},
-  {question:"'White-collar' workers in postwar America were:", options:["Industrial laborers in steel and auto factories","Undercover government investigators during the Red Scare","Office and professional workers whose ranks swelled in the booming economy","Veterans who returned and immediately joined the federal workforce"], correct:2},
-  {question:"The hydrogen bomb was different from the atomic bomb because:", options:["It relied on chemical rather than nuclear reactions","It was far more powerful — a thermonuclear weapon tested in 1952–53","It was small enough to be fired from a naval vessel","It was built purely for defensive, not offensive, purposes"], correct:1},
-  {question:"A 'loyalty oath' for government workers during the Red Scare was:", options:["A financial pledge to support Marshall Plan funding","A promise to report overseas travel to federal authorities","A sworn statement that the employee was not a communist sympathizer","A military service commitment in case of Soviet invasion"], correct:2},
-  {question:"The postwar 'liberal consensus' referred to:", options:["A U.S.-Soviet agreement to limit nuclear arsenals","Broad American support for social programs, economic growth, and anti-communist foreign policy","A backroom deal splitting power between Democrats and Republicans","Western Europe's collective agreement to accept American aid"], correct:1},
-  {question:"The aerospace industry expanded rapidly during the Cold War mainly due to:", options:["Mass commercial air travel becoming affordable for average Americans","Military demand and the U.S.-Soviet Space Race driving massive government investment","The GI Bill creating thousands of aerospace engineering scholarships","European nations contracting U.S. companies to build their air forces"], correct:1},
-  {question:"Cold War 'infrastructure' investment by the U.S. government notably included:", options:["Nuclear fallout shelters built beneath every major American city","Rebuilding European roads and factories through the Marshall Plan","The Interstate Highway System, partly justified by military transport needs","A massive expansion of the Atlantic naval fleet"], correct:2},
-  {question:"McCarthyism is best described as:", options:["A diplomatic strategy for engaging with communist regimes","Making reckless unproven accusations of communist disloyalty during the Red Scare","McCarthy's official foreign policy agenda for his 1952 presidential run","A loyalty screening program launched by President Eisenhower"], correct:1},
-  {question:"The Marshall Plan was named after Secretary of State George Marshall because:", options:["He commanded all Allied forces in Europe throughout WWII","He proposed and championed the European economic aid program","He was Truman's chief of staff who drafted the legislation","He personally delivered the aid packages to European capitals"], correct:1},
-  {question:"The Cold War 'arms race' was:", options:["A competition among U.S. states to win Defense Department contracts","A sprint to land the first humans on the moon","The U.S.-Soviet buildup of increasingly powerful nuclear and conventional weapons","A UN disarmament program both sides publicly supported"], correct:2},
-  {question:"Eisenhower's warning about the 'military-industrial complex' described:", options:["Soviet spy rings embedded in U.S. weapons factories","NATO's growing centralized military command structure","The dangerous, growing influence of the defense industry over U.S. government decisions","Communist efforts to infiltrate American weapons manufacturing plants"], correct:2},
-  {question:"During the Red Scare, 'subversion' referred to:", options:["A direct foreign military attack on U.S. territory","Peaceful protests against U.S. Cold War foreign policy","Secretly working to undermine or overthrow the government from the inside","Publishing newspaper editorials critical of American democracy"], correct:2},
-  {question:"The Domino Theory held that:", options:["Nuclear war would destroy all nations simultaneously and equally","Each economic depression in one country would trigger collapse in others","If one nation fell to communism, its neighbors would likely follow","Democracies were naturally stronger and would always outlast communist states"], correct:2},
+const hydroQuiz = [
+  {question:"Water is a _______ substance, meaning it will NOT mix with _______ substances.", options:["polar, nonpolar","nonpolar, polar","nonpolar, nonpolar","polar, polar"], correct:0},
+  {question:"Ice floats because water _______ as a solid.", options:["lightens","expands","condenses","evaporates"], correct:1},
+  {question:"Water has to absorb a lot of heat before its temperature rises. This property is:", options:["heat of vaporization","high specific heat","cohesion","adhesion"], correct:1},
+  {question:'Opposites _______', options:['repel','attract','have no affect on each other','separate'], correct:1},
+  {question:"Surface tension, water moving 'against gravity', and droplets on a table are explained by:", options:["adhesion","condensation","cohesion","adhesion and cohesion"], correct:2},
+  {question:"Which is an example of adhesion?", options:["Water droplets running down the side of a glass","Water droplets staying on top of a penny","Tree frogs sticking to whatever they climb on","All of the above"], correct:3},
+  {question:"The opposite of evaporation is _______", options:["transpiration","condensation","infiltration","precipitation"], correct:1},
+  {question:"Deforestation most directly affects _______", options:["condensation","transpiration","evaporation","runoff"], correct:1},
+  {question:"Bethalto is very flat, so we will have higher amounts of _______", options:["runoff","transpiration","evaporation","infiltration"], correct:0},
+  {question:"True/False: An aquifer is underground/below Earth's surface.", options:["True","False"], correct:0},
+  {question:"Deforestation will lead to a(n) _______ in runoff.", options:["increase","decrease","no effect","seasonal change"], correct:0},
+  {question:"Which type of water is most commonly found on Earth's surface?", options:["salt water","brackish water","fresh water","tap water"], correct:0},
+  {question:"An area where all water drains to a certain body of water is a _______.", options:["estuary","divide","watershed","bay"], correct:2},
+  {question:"The _______ elevation in a watershed forms the divide between watersheds.", options:["lowest","flattest","highest","steepest"], correct:2},
+  {question:"A mountain stream is an example of _______", options:["Headwaters","an area of high biodiversity","an estuary","slow flowing water"], correct:0},
+  {question:"Which is NOT a characteristic of waters at higher elevations?", options:["fast flowing","low biodiversity","murky","cold"], correct:2},
+  {question:"Cold & fast to warm & slow means there has been a change in _______", options:["fish populations","elevation","freshwater concentration","watersheds"], correct:1},
+  {question:"Where the Mississippi River meets the Gulf of Mexico is an example of a(n) _______", options:["watershed","wide river","divide","estuary"], correct:3},
+  {question:"What are examples of pollutants that get into surface waters?", options:["oil","excess chemicals/nutrients","human waste/litter","all of the above"], correct:3},
+  {question:"True/False: Using excess personal water is a tragedy of the commons.", options:["true","false"], correct:0},
+  {question:"What is an example of an aquifer in the Midwest?", options:["Mississippi","Ogallala","Beaver Dam","Edwardsville Watershed"], correct:1},
+  {question:"Which statement is FALSE about groundwater?", options:["It is found underground","It fills gaps between soil and sediment","It is stored in aquifers","It cannot be recharged"], correct:3},
+  {question:"Groundwater is MOST used for _______", options:["Farming","Consumption","Lake recharging","Hydropower"], correct:0},
+  {question:"The water table separates the _______ and _______ zones underground.", options:["saturated, unsaturated","unconfined, confined","permeable, impermeable","irrigated, nonirrigated"], correct:0},
+  {question:"The 'man-made' version of a spring is _______", options:["aquitard","well/pump","drip irrigation","furrow irrigation"], correct:1},
+  {question:"Which layer of an aquifer is IMpermeable?", options:["unconfined layer","confined layer","aquitard","sediment/rock"], correct:2},
+  {question:"Confined and unconfined aquifers are both made up of groundwater and _______.", options:["rock","clay","soil","mud"], correct:0},
+  {question:"Running aquifers dry is a concern because confined aquifers take a long time to _______.", options:["settle","recharge","irrigate","pump out"], correct:1},
+  {question:"Which is NOT a common type of irrigation?", options:["drip","furrow","spray","grid"], correct:3},
+  {question:"The Dust Bowl occurred because of poor farming techniques and _______", options:["high winds","prolonged drought","lack of irrigation","all of the above"], correct:3},
+  {question:"New farming techniques will help to prevent _______", options:["irrigation overloads","drying up aquifers","another dust bowl","prolonged drought"], correct:2},
+  {question:"To help prevent another Dust Bowl, the government _______.", options:["instituted national parks","purchased land to restore grassland areas","reduced aquifer usage by farmers","reduced inefficient irrigation systems"], correct:1},
 ];
 
-SUBJECTS.history.flashcards = coldWarFlashcards;
-SUBJECTS.history.quiz = coldWarQuiz;
-
-// ── MARKETING DATA ─────────────────────────────────────────────
-const marketingFlashcards = [
-  {category:'concept', question:"What is the Marketing Concept?", answer:"A business philosophy focused on satisfying customer needs and wants as the key to achieving company goals."},
-  {category:'concept', question:"What are the 3 types of buying motives?", answer:"Emotional (impulse, little thought), Rational (needs analysis, budget, comparison), and Patronage (loyalty to a brand or store)."},
-  {category:'concept', question:"What is an Emotional purchase?", answer:"Spending with very little thought — driven by feelings, impulse, or mood rather than logic."},
-  {category:'concept', question:"What is a Rational purchase?", answer:"A thoughtful purchase involving recognizing needs and wants, setting budget priorities, and comparing alternatives."},
-  {category:'concept', question:"What is a Patronage purchase?", answer:"Basing a purchase on loyalty to a particular brand, product, or store — even if cheaper alternatives exist."},
-  {category:'concept', question:"What is Mass Marketing?", answer:"A strategy that targets the broadest possible audience with a single message, reaching more people but less precisely."},
-  {category:'concept', question:"What is Target Marketing?", answer:"A strategy that focuses on a specific group of consumers identified through market segmentation."},
-  {category:'concept', question:"Which marketing type reaches a larger audience?", answer:"Mass Marketing — it broadcasts to everyone rather than a specific segment."},
-  {category:'concept', question:"Which marketing type has lower costs?", answer:"Mass Marketing — one campaign for everyone costs less than tailored campaigns for specific segments."},
-  {category:'concept', question:"Which marketing type uses market segmentation?", answer:"Target Marketing — it divides the market into segments and focuses on specific groups."},
-  {category:'vocab', question:"Define: Market Segmentation", answer:"The process of dividing a broad market into distinct subgroups of consumers who have common needs, characteristics, or behaviors."},
-  {category:'vocab', question:"Define: Demographics (segmentation)", answer:"Divides the market using measurable data such as age, income, gender, education, and profession."},
-  {category:'vocab', question:"Define: Psychographics (segmentation)", answer:"Focuses on characteristics that cannot be physically measured — personality, values, lifestyle, interests, and opinions."},
-  {category:'vocab', question:"Define: Behavioral segmentation", answer:"Focuses on customers' attitudes toward, use of, or response to products and services."},
-  {category:'vocab', question:"Define: Geographic segmentation", answer:"Divides the market based on physical location — country, region, city, climate, or neighborhood."},
-  {category:'vocab', question:"Define: Target Market", answer:"The specific group of consumers a business aims its marketing efforts and products toward."},
-  {category:'scenario', question:"What is the bottom line for maintaining successful marketing relationships?", answer:"Customer Satisfaction — keeping customers happy drives repeat business and long-term success."},
-  {category:'scenario', question:"Buying a $30 T-shirt after your favorite college team wins the national championship is an example of what kind of purchase?", answer:"Patronage purchase — you're buying based on loyalty and emotional connection to the team/brand, not rational need."},
-  {category:'scenario', question:"College athletic conferences were historically grouped by geographic proximity. What type of segmentation is that?", answer:"Geographic segmentation — grouping based on physical location."},
-  {category:'scenario', question:"'Females between the ages of 14 and 18' is an example of what?", answer:"A specific market segment — it uses demographic segmentation (age and gender) to define a targeted group."},
-];
-
-const marketingQuiz = [
-  {question:"What is the marketing concept?", options:["The strategy used to get the most sales","Satisfying customer needs and wants as the path to company success","Creating the most advertisements possible","Selling products at the lowest price"], correct:1},
-  {question:"Which of the following describes an Emotional purchase?", options:["Comparing prices across three stores before buying","Buying based on loyalty to your favorite brand","Spending with very little thought, driven by feeling","Budgeting carefully before deciding what to buy"], correct:2},
-  {question:"Which describes a Rational purchase?", options:["Buying impulsively after seeing a sale sign","Purchasing because of loyalty to a brand","Recognizing a need, setting a budget, and comparing alternatives","Buying a jersey after your team wins the championship"], correct:2},
-  {question:"Which describes a Patronage purchase?", options:["Buying on impulse after seeing an ad","Carefully comparing product features and prices","Spending based on loyalty to a particular brand or store","Purchasing based on geographic location"], correct:2},
-  {question:"Which type of marketing reaches a larger audience?", options:["Target Marketing","Mass Marketing","Behavioral Marketing","Psychographic Marketing"], correct:1},
-  {question:"Which type of marketing targets a specific group of consumers?", options:["Mass Marketing","Geographic Marketing","Target Marketing","Demographic Marketing"], correct:2},
-  {question:"Which type of marketing typically has lower marketing costs?", options:["Target Marketing","Behavioral Marketing","Psychographic Marketing","Mass Marketing"], correct:3},
-  {question:"Which type of marketing uses market segmentation?", options:["Mass Marketing","Target Marketing","Broadcast Marketing","Undifferentiated Marketing"], correct:1},
-  {question:"Demographic segmentation divides the market by:", options:["Customer attitudes toward products","Physical location like city or region","Measurable data like age, income, and profession","Personality, values, and lifestyle"], correct:2},
-  {question:"Psychographic segmentation focuses on:", options:["Where customers live geographically","Age, gender, and income data","Personality, values, lifestyle, and interests that cannot be physically measured","Purchase frequency and brand loyalty"], correct:2},
-  {question:"Behavioral segmentation focuses on:", options:["Customer ZIP codes and regions","Age, income, and education levels","Customers' attitudes toward and responses to products","Religious and cultural beliefs"], correct:2},
-  {question:"Geographic segmentation divides the market by:", options:["Customer personality and lifestyle","Age, income, and profession","Physical location such as region, city, or climate","Brand loyalty and purchase history"], correct:2},
-  {question:"'Females between the ages of 14 and 18' is an example of:", options:["The entire population of a country","A specific market segment using demographic data","A mass marketing target audience","A psychographic customer profile"], correct:1},
-  {question:"The bottom line for maintaining successful marketing relationships is:", options:["Profit maximization","Increased market share","Product quality ratings","Customer satisfaction"], correct:3},
-  {question:"Buying a $30 T-shirt right after your college team wins the championship is an example of:", options:["A rational purchase after careful comparison","An emotional impulse with no brand connection","A patronage purchase based on team/brand loyalty","A geographic purchase decision"], correct:2},
-  {question:"College conferences grouped by geographic proximity use what type of segmentation?", options:["Demographic segmentation","Psychographic segmentation","Behavioral segmentation","Geographic segmentation"], correct:3},
-  {question:"Which answer correctly matches Rational purchase behavior?", options:["Buying your usual brand without thinking","Grabbing a snack impulsively at checkout","Researching, budgeting, and comparing before buying a laptop","Buying a team jersey the moment they win"], correct:2},
-  {question:"A company targeting 'outdoor enthusiasts who value sustainability' is using:", options:["Demographic segmentation","Geographic segmentation","Psychographic segmentation","Behavioral segmentation"], correct:2},
-  {question:"Which of the following is NOT a type of market segmentation?", options:["Demographic","Psychographic","Emotional","Geographic"], correct:2},
-  {question:"Market segmentation is used in:", options:["Mass Marketing only","Target Marketing only","Both mass and target marketing equally","Neither — it applies only to advertising agencies"], correct:1},
-];
-
-SUBJECTS.marketing.flashcards = marketingFlashcards;
-SUBJECTS.marketing.quiz = marketingQuiz;
+SUBJECTS.hydro.flashcards = hydroFlashcards;
+SUBJECTS.hydro.quiz = hydroQuiz;
 
 // ═══════════════════════════════════════════════════════════════
 //  PAGE NAVIGATION
@@ -1230,9 +1135,15 @@ function goToApp(subject) {
   // Build filter chips
   const filterRow = document.getElementById('filter-row');
   filterRow.innerHTML = `<div class="filter-chip active" onclick="setFilter('all',this)">All Cards</div>`;
+  const catLabels = {
+    'properties': 'Properties', 'water-cycle': 'Water Cycle',
+    'groundwater': 'Groundwater', 'farming': 'Farming',
+    'concept': 'Concepts', 'vocab': 'Vocab', 'scenario': 'Scenarios',
+    'people': 'People', 'event': 'Events'
+  };
   subj.categories.forEach(cat => {
-    const label = cat.charAt(0).toUpperCase() + cat.slice(1);
-    filterRow.innerHTML += `<div class="filter-chip" onclick="setFilter('${cat}',this)">${label}s</div>`;
+    const label = catLabels[cat] || (cat.charAt(0).toUpperCase() + cat.slice(1));
+    filterRow.innerHTML += `<div class="filter-chip" onclick="setFilter('${cat}',this)">${label}</div>`;
   });
 
   // Init data
