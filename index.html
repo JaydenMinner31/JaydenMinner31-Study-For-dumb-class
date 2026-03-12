@@ -772,21 +772,33 @@ body {
 .splash-btn-icon { transition: transform 0.25s ease; display: inline-block; }
 
 /* Orbiting dots */
+.orbit-ring {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  pointer-events: none;
+}
+.orbit-ring.or1 { animation: spin 6s  -1.5s linear infinite; }
+.orbit-ring.or2 { animation: spin 9s  -4s   linear infinite reverse; }
+.orbit-ring.or3 { animation: spin 14s -8s   linear infinite; }
+
 .orbit-dot {
   position: absolute;
+  top: 50%;
+  /* Place dot at the ring edge — translateX by radius, then nudge up by half dot size */
+  left: 50%;
   width: clamp(6px,1.5vw,9px);
   height: clamp(6px,1.5vw,9px);
   border-radius: 50%;
-  background: var(--accent);
-  box-shadow: 0 0 12px var(--accent);
+  transform: translateX(calc(min(44vw, 44vh, 252px))) translateY(-50%);
 }
-.od1 { animation: orbit1 6s -1s linear infinite; }
-.od2 { animation: orbit1 9s -3s linear infinite reverse; background: var(--accent2); box-shadow: 0 0 12px var(--accent2); }
-.od3 { animation: orbit1 14s -6s linear infinite; background: var(--blue); box-shadow: 0 0 12px var(--blue); opacity: 0.7; }
+.od1 { background: var(--accent);  box-shadow: 0 0 12px var(--accent); }
+.od2 { background: var(--accent2); box-shadow: 0 0 12px var(--accent2); }
+.od3 { background: var(--blue);    box-shadow: 0 0 12px var(--blue); opacity: 0.7; }
 
-@keyframes orbit1 {
-  0%   { transform: rotate(0deg) translateX(calc(min(44vw, 44vh, 252px))) rotate(0deg); }
-  100% { transform: rotate(360deg) translateX(calc(min(44vw, 44vh, 252px))) rotate(-360deg); }
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
 }
 
 /* Corner decorations */
@@ -862,9 +874,9 @@ body {
       </div>
     </div>
     <!-- Orbiting dots -->
-    <div class="orbit-dot od1"></div>
-    <div class="orbit-dot od2"></div>
-    <div class="orbit-dot od3"></div>
+    <div class="orbit-ring or1"><div class="orbit-dot od1"></div></div>
+    <div class="orbit-ring or2"><div class="orbit-dot od2"></div></div>
+    <div class="orbit-ring or3"><div class="orbit-dot od3"></div></div>
   </div>
   <!-- Corner decorations -->
   <div class="splash-corner tl"></div>
@@ -900,6 +912,19 @@ body {
         <div class="subject-pills">
           <span class="subject-pill">32 flashcards</span>
           <span class="subject-pill">32 quiz questions</span>
+        </div>
+      </div>
+      <div class="subject-arrow">›</div>
+    </div>
+
+    <div class="subject-card history15" onclick="goToApp('history15')">
+      <div class="subject-icon">🏛️</div>
+      <div class="subject-info">
+        <div class="subject-title">US History Chapter 15</div>
+        <div class="subject-meta">The 1950s · Sections 1.1–1.3</div>
+        <div class="subject-pills">
+          <span class="subject-pill">26 flashcards</span>
+          <span class="subject-pill">24 quiz questions</span>
         </div>
       </div>
       <div class="subject-arrow">›</div>
@@ -1040,6 +1065,12 @@ const SUBJECTS = {
     categories: ['properties','water-cycle','groundwater','farming'],
     flashcards: null,
     quiz: null,
+  },
+  history15: {
+    label: 'US History · Chapter 15 · The 1950s',
+    categories: ['vocab','people-programs','thinking'],
+    flashcards: null,
+    quiz: null,
   }
 };
 
@@ -1120,6 +1151,84 @@ const hydroQuiz = [
 SUBJECTS.hydro.flashcards = hydroFlashcards;
 SUBJECTS.hydro.quiz = hydroQuiz;
 
+// ── US HISTORY CH.15 DATA ────────────────────────────────────
+const history15Flashcards = [
+  // ── 15.1.1 EISENHOWER AS PRESIDENT ──
+  {category:'vocab', question:'Consumerism', answer:'Theory that the economy flourishes when people buy, or consume, goods and services.'},
+  {category:'vocab', question:'Agribusiness', answer:'The commercial business of agriculture — large-scale farming run like a corporation.'},
+  {category:'vocab', question:'Smog', answer:'Noxious combination of fog and smoke from factories; air pollution from industrial activity.'},
+  {category:'vocab', question:'Nuclear deterrence', answer:'Placing nuclear weapons to outnumber those of an enemy so that they cannot be destroyed — deterring attack through threat.'},
+  {category:'vocab', question:'Brinkmanship', answer:'Pushing a conflict to the edge of (the brink of) war without actually going to war.'},
+  {category:'vocab', question:'Covert action', answer:'Activity to influence the political, economic, or military situation in another country — done secretly.'},
+  {category:'vocab', question:'Bulwarks', answer:'Provides protection or defense; a barrier against attack.'},
+
+  // ── 15.1.1 THINKING ──
+  {category:'thinking', question:"Which of Truman’s domestic policies did Eisenhower continue?", answer:'Social Security Program — Eisenhower expanded it rather than dismantling the New Deal safety net.'},
+  {category:'thinking', question:'How did technological development affect society and the economy in the US during the 1950s?', answer:'Industrial waste products polluted the air; companies grew with new technologies, boosting the economy but creating environmental problems.'},
+  {category:'thinking', question:"How did the US interfere in foreign governments during Eisenhower’s first term?", answer:"The US used the CIA for covert operations, overthrowing governments seen as communist threats (Iran 1953, Guatemala 1954)."},
+
+  // ── 15.1.2 AMERICAN SOCIETY ──
+  {category:'vocab', question:'Domesticity', answer:'Home life — the focus on family, homemaking, and suburban living that defined 1950s culture.'},
+  {category:'vocab', question:'Baby boom', answer:'Label for those born in 1954–1960s because of how many were being born after WWII veterans returned home.'},
+  {category:'vocab', question:'Consumer society', answer:'Purchased over 21 million automobiles, 20 million refrigerators — people buying goods in enormous quantities.'},
+  {category:'vocab', question:'Transistor', answer:'Electronic device used to control the flow of electricity in electronic equipment; replaced vacuum tubes and made electronics smaller.'},
+  {category:'vocab', question:'Nuclear power', answer:'Energy from nuclear fission — blades turn to power generators and make electricity.'},
+  {category:'people-programs', question:'California Master Plan (1960)', answer:"Plan to organize California’s public higher education into 3 tiers: UC, Cal State, and community colleges."},
+
+  // ── 15.1.2 THINKING ──
+  {category:'thinking', question:'How did the Cold War affect the lives of ordinary Americans?', answer:'Created fear of nuclear attack — people built bomb shelters, schools ran duck-and-cover drills, and anxiety about Soviet threat was constant.'},
+  {category:'thinking', question:'How did the return of WWII veterans have complex effects on women in the workforce?', answer:'Returning vets reclaimed jobs, pushing many women out of the workforce. Evidence: wage records, census reports showing female employment dropped.'},
+  {category:'thinking', question:'What factors contributed to the development of a consumer society in the United States?', answer:'Post-WWII prosperity, the GI Bill, and suburban growth — veterans got loans, bought homes and cars, fueling mass consumption.'},
+
+  // ── 15.1.3 SUBURBS SURROUND CITIES ──
+  {category:'vocab', question:'Suburbanization', answer:'A population shift from cities to outlying communities — communities were rapidly transforming the American landscape.'},
+  {category:'vocab', question:'Homogeneity', answer:'Sameness — suburbs were criticized for being racially and socioeconomically uniform.'},
+  {category:'vocab', question:'Subdivisions', answer:'Mass-produced neighborhoods — large tracts of land divided into lots with nearly identical houses.'},
+  {category:'people-programs', question:'Interstate Highway System', answer:'Linked towns, cities, and suburbs nationwide — made car travel and commuting easy, fueling suburban growth.'},
+  {category:'people-programs', question:'Levittown', answer:'A large town with thousands of homes all almost identical — the model of mass-produced suburban housing built by William Levitt.'},
+
+  // ── 15.1.3 THINKING ──
+  {category:'thinking', question:'What motivated many Americans to move to the suburbs during the Cold War years?', answer:'Cheap and easy living — affordable homes with GI Bill loans, new highways making commuting possible, and fear of urban congestion.'},
+  {category:'thinking', question:"What did William Levitt mean: No man who owns his own house can be a communist?", answer:"He promoted home ownership as an American value — owning property was tied to American freedom, not communism."},
+  {category:'thinking', question:"What is the greatest problem from suburban growth?", answer:"It left poor people behind in the cities — urban areas declined while suburbs excluded minorities through redlining."},
+];
+
+const history15Quiz = [
+  // 15.1.1 vocab
+  {question:'What is consumerism?', options:['Government spending on public works','Theory that the economy flourishes when people buy goods and services','The practice of saving money during wartime','A Cold War foreign policy strategy'], correct:1},
+  {question:'What is agribusiness?', options:['Small family farming','Government farm subsidies','The commercial large-scale business of agriculture','Organic food production'], correct:2},
+  {question:'Smog is best described as:', options:['A type of nuclear fallout','Fog caused by cold fronts','A noxious combination of fog and smoke from factories','Water vapor from industrial cooling towers'], correct:2},
+  {question:'Nuclear deterrence means:', options:['Banning all nuclear weapons','Building up nuclear weapons so enemies are deterred from attacking','Using nuclear energy for electricity','Testing nuclear bombs underground'], correct:1},
+  {question:'Brinkmanship is the policy of:', options:['Negotiating peace treaties before conflict','Withdrawing from international alliances','Pushing a conflict to the very edge of war without going to war','Using covert agents in foreign countries'], correct:2},
+  {question:'Covert action refers to:', options:['Openly declared military operations','Secret activities to influence another country\'s political or military situation','Congressional oversight of the CIA','Diplomatic negotiations in secret'], correct:1},
+  {question:'Bulwarks provide:', options:['Economic trade routes','Democratic elections','Protection or defense','Technological advancement'], correct:2},
+  {question:'Which Truman domestic policy did Eisenhower continue?', options:['The New Deal public works projects','The Social Security Program','The Marshall Plan','The Fair Deal housing act'], correct:1},
+  {question:"How did the US interfere in foreign governments during Eisenhower’s first term?", options:['By sending troops openly to overthrow leaders','By using the CIA for covert operations overthrowing governments','By imposing economic sanctions only','By forming new military alliances'], correct:1},
+
+  // 15.1.2 vocab
+  {question:'What does domesticity refer to in 1950s context?', options:['Government housing programs','Factory production of household goods','Focus on home life and family — the domestic sphere','Women entering the workforce'], correct:2},
+  {question:'The baby boom refers to:', options:['A wartime decrease in birth rates','The large number of children born in 1954-1960s as veterans returned home','Government programs for infant care','Hospital construction in the 1950s'], correct:1},
+  {question:'What best describes the consumer society of the 1950s?', options:['People saving money and avoiding debt','Mass purchasing of goods like cars and appliances — over 21 million autos sold','Government rationing of consumer goods','A shift toward agricultural self-sufficiency'], correct:1},
+  {question:'A transistor is:', options:['A type of nuclear reactor','A highway interchange system','An electronic device controlling the flow of electricity in equipment','A government economic policy'], correct:2},
+  {question:'The California Master Plan (1960) organized:', options:['Highway construction across the state','California’s public higher education into 3 tiers','Suburban housing development','The state’s nuclear energy program'], correct:1},
+  {question:'How did the Cold War most affect everyday American life?', options:['It caused widespread food shortages','It created fear of nuclear attack and constant anxiety about the Soviet threat','It brought Americans closer to their European allies','It led to mass military drafts throughout the 1950s'], correct:1},
+  {question:'What factors most contributed to the consumer society in the US?', options:['Wartime rationing habits and frugality','Post-WWII prosperity, the GI Bill, and suburban growth','Socialist economic policies from the New Deal','Foreign imports flooding American markets'], correct:1},
+
+  // 15.1.3 vocab
+  {question:'Suburbanization refers to:', options:['Urban renewal programs in city centers','Population shift from cities to outlying communities','Government construction of public housing','Industrial expansion into rural areas'], correct:1},
+  {question:'Homogeneity in 1950s suburbs meant:', options:['Cultural diversity and racial integration','Economic inequality between neighbors','Sameness — suburbs were racially and socioeconomically uniform','Mixed-use zoning of homes and businesses'], correct:2},
+  {question:'Subdivisions were:', options:['Government districts for tax collection','Mass-produced neighborhoods of nearly identical homes on divided land','Agricultural zones on city outskirts','Military housing near bases'], correct:1},
+  {question:'The Interstate Highway System:', options:['Was built mainly for military use only','Connected cities and suburbs nationwide, fueling suburban growth','Replaced railroad transport across the country','Was opposed by Eisenhower as too expensive'], correct:1},
+  {question:'Levittown is best described as:', options:['A government housing project in New York City','A diverse urban neighborhood','A large town of thousands of nearly identical mass-produced homes','A planned community exclusively for veterans'], correct:2},
+  {question:"What motivated Americans to move to suburbs in the Cold War era?", options:['Fear of urban crime and desire for diversity','Cheap housing, GI Bill loans, and easy commuting via new highways','Government mandates to reduce urban crowding','The decline of industrial jobs in cities'], correct:1},
+  {question:"What did Levitt mean by: a homeowner cannot be a communist?", options:['Communists were not allowed to buy homes','Home ownership tied to American identity and freedom, opposing communism','The government should build homes for all citizens','Property taxes were a form of socialism'], correct:1},
+  {question:'The greatest problem resulting from suburban growth was:', options:['Highway congestion in rural areas','Overproduction of identical housing styles','Poor people and minorities left behind in declining cities, excluded by redlining','A decrease in consumer spending on goods'], correct:2},
+];
+
+SUBJECTS.history15.flashcards = history15Flashcards;
+SUBJECTS.history15.quiz = history15Quiz;
+
+
 // ═══════════════════════════════════════════════════════════════
 //  PAGE NAVIGATION
 // ═══════════════════════════════════════════════════════════════
@@ -1139,7 +1248,8 @@ function goToApp(subject) {
     'properties': 'Properties', 'water-cycle': 'Water Cycle',
     'groundwater': 'Groundwater', 'farming': 'Farming',
     'concept': 'Concepts', 'vocab': 'Vocab', 'scenario': 'Scenarios',
-    'people': 'People', 'event': 'Events'
+    'people': 'People', 'event': 'Events',
+    'people-programs': 'People & Programs', 'thinking': 'Historical Thinking'
   };
   subj.categories.forEach(cat => {
     const label = catLabels[cat] || (cat.charAt(0).toUpperCase() + cat.slice(1));
